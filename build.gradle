@@ -1,0 +1,32 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "0.3.1"
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+intellij {
+    //noinspection GroovyAssignabilityCheck
+    version 'IC-2018.1' // IntelliJ IDEA 2018.1
+    plugins []
+    //noinspection GroovyAssignabilityCheck
+    pluginName 'sample-intellij-plugin'
+}
+//noinspection GroovyAssignabilityCheck
+group 'com.chriscarini'
+//noinspection GroovyAssignabilityCheck
+version '0.1'
+
+patchPluginXml {
+    changeNotes """
+      <h3> Version 0.1</h3>
+      Initial Revision. Laying the foundation.<br>
+      """
+}

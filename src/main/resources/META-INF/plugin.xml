@@ -1,0 +1,31 @@
+<idea-plugin>
+    <id>com.chriscarini.sample-intellij-plugin</id>
+    <name>sample-intellij-plugin</name>
+    <vendor email="chris@chriscarini.com" url="https://chriscarini.com">Chris Carini</vendor>
+
+    <description><![CDATA[
+    This is a sample plugin for the JetBrains IntelliJ IDEA IDE.<br>
+    It was created to work with IntelliJ IDEA 2018.1-RELEASE and may not work with subsequent versions.
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <group id="SamplePlugin.SampleMenu" text="Sample Plugin" description="Menu for Sample Plugin">
+            <add-to-group group-id="MainMenu" anchor="first"/>
+        </group>
+
+        <action class="com.chriscarini.sampleintellijplugin.actions.HelloAction" id="HelloAction">
+            <add-to-group group-id="SamplePlugin.SampleMenu" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>

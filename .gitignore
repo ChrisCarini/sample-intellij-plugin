@@ -6,4 +6,5 @@ build/
 gradle/
 out/
 gradlew*
+jetbrainsCredentials.gradle
 *.DS_Store

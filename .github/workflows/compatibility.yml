@@ -25,10 +25,7 @@ jobs:
         env:
           IS_CI: "True"
 
-      - uses: thepieterdc/intellij-plugin-verifier-action@v1.1.0
+      - uses: thepieterdc/intellij-plugin-verifier-action@v1.0.0
         with:
           plugin: '/home/runner/work/sample-intellij-plugin/sample-intellij-plugin/build/distributions/sample-intellij-plugin-*'
-          versions: |
-            2019.3
-            2018.3
-            2017.3
+          version: '2019.3'

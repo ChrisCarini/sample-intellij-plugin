@@ -7,7 +7,7 @@ on:
 
 jobs:
   compatibility:
-    name: Ensure plugin compatibility against the lowest and latest EAP version.
+    name: Ensure plugin compatibility against 2019.3 & the latest EAP snapshot for both IDEA Community, IDEA Ultimate.
 
     runs-on: ubuntu-latest
 
@@ -25,7 +25,23 @@ jobs:
         env:
           IS_CI: "True"
 
-      - uses: thepieterdc/intellij-plugin-verifier-action@v1.0.0
+      - name: Verify Plugin on IntelliJ Platforms
+        id: verify
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@v0.0.1
         with:
-          plugin: '/home/runner/work/sample-intellij-plugin/sample-intellij-plugin/build/distributions/sample-intellij-plugin-*'
-          version: '2019.3'
+          verifier-version: '1.231'
+#          plugin-location: 'build/distributions/sample-intellij-plugin-*'
+          ide-versions: |
+            ideaIC:2019.3
+            ideaIU:2019.3
+            ideaIC:LATEST-EAP-SNAPSHOT
+            ideaIU:LATEST-EAP-SNAPSHOT
+#            ideaIC:2017.3  # Remove for testing of a successful execution
+#            pycharmPC:2019.3.4
+#            goland:2019.3.3
+#            clion:2019.3.4
+
+      - name: Get log file path and print contents
+        run: |
+          echo "The log file path is: ${{steps.verify.outputs.verification-output-log-filename}}" ;
+          cat ${{steps.verify.outputs.verification-output-log-filename}}

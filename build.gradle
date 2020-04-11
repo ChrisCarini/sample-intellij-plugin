@@ -74,6 +74,7 @@ tasks.withType(JavaCompile) {
                                  '-Xlint:-classfile']) //ignore warnings from dependencies
 }
 
+// NOTE: This plugin is not published to the marketplace!!! You won't be able to publish it!!
 if (System.getenv('IS_CI') != "True") {
     // The below file (jetbrainsCredentials.gradle) should contain the below:
     //    project.ext.set("intellijPublishUsername", "YOUR_USERNAME_HERE")

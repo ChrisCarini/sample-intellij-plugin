@@ -1,0 +1,49 @@
+name: IntelliJ Plugin Compatibility (multi-run)
+
+on:
+  push:
+
+jobs:
+  compatibility:
+    strategy:
+      matrix:
+        ide_platform:
+          - ideaIC
+          - ideaIU
+        ide_version:
+          - 2020.1
+          - LATEST-EAP-SNAPSHOT
+
+      # We want to get a signal for each of the IDEs we've specified above, hence, we don't want to fail the entire
+      #   workflow based on the first failed job produced by the matrix strategy.
+      fail-fast: false
+
+    name: ${{ matrix.ide_platform }} ${{ matrix.ide_version }} plugin compatibility
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v1
+
+      - name: Setup Java 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Build the plugin
+        run: ./gradlew buildPlugin
+        env:
+          IS_CI: "True"
+
+      - name: Verify plugin on ${{ matrix.ide_platform }} ${{ matrix.ide_version }}
+        id: verify
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
+        with:
+          ide-versions: |
+            ${{ matrix.ide_platform }}:${{ matrix.ide_version }}
+
+      - name: Get log file path and print contents
+        run: |
+          echo "The log file path is: ${{steps.verify.outputs.verification-output-log-filename}}" ;
+          cat ${{steps.verify.outputs.verification-output-log-filename}}

@@ -243,7 +243,7 @@ df -h | while read line; do echo "::debug::$line"; done
 
 echo "::set-output name=verification-output-log-filename::$VERIFICATION_OUTPUT_LOG"
 
-# Validate the log; fail if we find compatability problems.
+# Validate the log; fail if we find compatibility problems.
 if (grep -E -q "^Plugin (.*) against .*: .* compatibility problems?$" "$VERIFICATION_OUTPUT_LOG"); then
   echo "::error::=============================================="
   echo "::error::=============================================="

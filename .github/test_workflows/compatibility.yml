@@ -27,9 +27,9 @@ jobs:
 
       - name: Verify Plugin on IntelliJ Platforms
         id: verify
-        uses: ChrisCarini/intellij-platform-plugin-verifier-action@v0.0.1
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
         with:
-          verifier-version: '1.231'
+#          verifier-version: '1.231'
 #          plugin-location: 'build/distributions/sample-intellij-plugin-*'
           ide-versions: |
             ideaIC:2020.1

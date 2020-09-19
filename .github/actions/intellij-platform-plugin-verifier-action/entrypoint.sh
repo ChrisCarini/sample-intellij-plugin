@@ -1,6 +1,36 @@
 #!/bin/bash
 
+###
+# This script expects 3 input variables:
+#  - intellij-plugin-verifier version
+#  - relative plugin path
+#  - new-line separated IDE + version
+#
+# See below for examples of these inputs.
+#
+# This script expects the following CLI tools be available:
+#   - curl
+#   - jq
+#
+# NOTE: This script works with GitHub Actions Debug Logging. Read more about it here: https://help.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#enabling-step-debug-logging
+#       To enable, set the following secret in the repository that contains the workflow using this action:
+#             - ACTIONS_STEP_DEBUG to true
+###
+
 set -eu
+
+##
+# GitHub Debug Function
+##
+gh_debug() {
+  if [[ "$#" -eq 0 ]]; then
+    while read line; do
+      echo "::debug::${line}"
+    done
+  else
+    echo "::debug::${1}"
+  fi
+}
 
 ##
 # Input Variables
@@ -35,41 +65,48 @@ INPUT_PLUGIN_LOCATION="$2"
 # ide-versions: ['ideaIU:2019.3.4','ideaIC:2019.3.4','pycharmPC:2019.3.4','goland:2019.3.3','clion:2019.3.4']
 INPUT_IDE_VERSIONS="$3"
 
-echo "::debug::INPUT_VERIFIER_VERSION => $INPUT_VERIFIER_VERSION"
-echo "::debug::INPUT_PLUGIN_LOCATION => $INPUT_PLUGIN_LOCATION"
-echo "::debug::INPUT_IDE_VERSIONS =>"
+gh_debug "INPUT_VERIFIER_VERSION => $INPUT_VERIFIER_VERSION"
+gh_debug "INPUT_PLUGIN_LOCATION => $INPUT_PLUGIN_LOCATION"
+gh_debug "INPUT_IDE_VERSIONS =>"
 echo "$INPUT_IDE_VERSIONS" | while read -r INPUT_IDE_VERSION; do
-echo "::debug::                   => $INPUT_IDE_VERSION"
+  gh_debug "                   => $INPUT_IDE_VERSION"
 done
 
+if [[ -f "$GITHUB_WORKSPACE/$INPUT_IDE_VERSIONS" ]]; then
+  gh_debug "$INPUT_IDE_VERSIONS is a file. Extracting file contents into variable."
+  INPUT_IDE_VERSIONS=$(cat "$INPUT_IDE_VERSIONS")
+  gh_debug "INPUT_IDE_VERSIONS =>"
+  echo "$INPUT_IDE_VERSIONS" | while read -r INPUT_IDE_VERSION; do
+    gh_debug "                   => $INPUT_IDE_VERSION"
+  done
+fi
 
 ##
 # Resolve verifier values
 ##
 if [[ "$INPUT_VERIFIER_VERSION" == "LATEST" ]]; then
-    echo "::debug::LATEST verifier version found, resolving version..."
-    GH_LATEST_RELEASE_FILE="$HOME/intellij-plugin-verifier_latest_gh_release.json"
-    curl -s https://api.github.com/repos/JetBrains/intellij-plugin-verifier/releases/latest > "$GH_LATEST_RELEASE_FILE"
-    VERIFIER_VERSION=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .tag_name | sed 's/[^[:digit:].]*//g')
-    VERIFIER_DOWNLOAD_URL=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].browser_download_url)
-    VERIFIER_JAR_FILENAME=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].name)
+  gh_debug "LATEST verifier version found, resolving version..."
+  GH_LATEST_RELEASE_FILE="$HOME/intellij-plugin-verifier_latest_gh_release.json"
+  curl -s https://api.github.com/repos/JetBrains/intellij-plugin-verifier/releases/latest >"$GH_LATEST_RELEASE_FILE"
+  VERIFIER_VERSION=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .tag_name | sed 's/[^[:digit:].]*//g')
+  VERIFIER_DOWNLOAD_URL=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].browser_download_url)
+  VERIFIER_JAR_FILENAME=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].name)
 else
-    echo "::debug::Using verifier version [$INPUT_VERIFIER_VERSION]..."
+  gh_debug "Using verifier version [$INPUT_VERIFIER_VERSION]..."
 
-    VERIFIER_VERSION=${INPUT_VERIFIER_VERSION}
-    VERIFIER_DOWNLOAD_URL="https://dl.bintray.com/jetbrains/intellij-plugin-service/org/jetbrains/intellij/plugins/verifier-cli/$INPUT_VERIFIER_VERSION/$VERIFIER_JAR_FILENAME"
-    # The filename of the `verifier-cli-*-all.jar` file
-    VERIFIER_JAR_FILENAME="verifier-cli-$VERIFIER_VERSION-all.jar"
+  VERIFIER_VERSION=${INPUT_VERIFIER_VERSION}
+  VERIFIER_DOWNLOAD_URL="https://dl.bintray.com/jetbrains/intellij-plugin-service/org/jetbrains/intellij/plugins/verifier-cli/$INPUT_VERIFIER_VERSION/$VERIFIER_JAR_FILENAME"
+  # The filename of the `verifier-cli-*-all.jar` file
+  VERIFIER_JAR_FILENAME="verifier-cli-$VERIFIER_VERSION-all.jar"
 fi
 
 # The full path of the `verifier-cli-*-all.jar` file
 VERIFIER_JAR_LOCATION="$HOME/$VERIFIER_JAR_FILENAME"
 
-echo "::debug::VERIFIER_VERSION => $VERIFIER_VERSION"
-echo "::debug::VERIFIER_DOWNLOAD_URL => $VERIFIER_DOWNLOAD_URL"
-echo "::debug::VERIFIER_JAR_FILENAME => $VERIFIER_JAR_FILENAME"
-echo "::debug::VERIFIER_JAR_LOCATION => $VERIFIER_JAR_LOCATION"
-
+gh_debug "VERIFIER_VERSION => $VERIFIER_VERSION"
+gh_debug "VERIFIER_DOWNLOAD_URL => $VERIFIER_DOWNLOAD_URL"
+gh_debug "VERIFIER_JAR_FILENAME => $VERIFIER_JAR_FILENAME"
+gh_debug "VERIFIER_JAR_LOCATION => $VERIFIER_JAR_LOCATION"
 
 ##
 # Other Variables
@@ -83,7 +120,9 @@ JAVA_HOME="/usr/lib/jvm/java-1.8-openjdk"
 # The location of the plugin
 PLUGIN_LOCATION="$GITHUB_WORKSPACE/$INPUT_PLUGIN_LOCATION"
 
-echo "::debug::PLUGIN_LOCATION => $PLUGIN_LOCATION"
+gh_debug "VERIFIER_JAR_FILENAME => $VERIFIER_JAR_FILENAME"
+gh_debug "VERIFIER_JAR_LOCATION => $VERIFIER_JAR_LOCATION"
+gh_debug "PLUGIN_LOCATION => $PLUGIN_LOCATION"
 
 # Variable to store the string of IDE tmp_ide_directories we're going to use for verification.
 IDE_DIRECTORIES=""
@@ -134,8 +173,8 @@ tmp_ide_directories="/tmp/ide_directories.txt"
 echo "Processing all IDE versions..."
 echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   echo "Processing IDE:Version = \"$IDE_VERSION\""
-  if [[ -z "$IDE_VERSION" ]]; then
-    echo "::debug::IDE_VERSION is empty; continuing with next iteration."
+  if [ -z "$IDE_VERSION" ]; then
+    gh_debug "IDE_VERSION is empty; continuing with next iteration."
     break
   fi
 
@@ -182,39 +221,34 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   df -h | while read line; do echo "::debug::$line"; done
 
   # Append the extracted location to the variable of IDEs to validate against.
-  echo "::debug::Adding $IDE_EXTRACT_LOCATION to '$tmp_ide_directories'..."
+  gh_debug "Adding $IDE_EXTRACT_LOCATION to '$tmp_ide_directories'..."
   printf "%s " "$IDE_EXTRACT_LOCATION" >>$tmp_ide_directories
 done
 
 ##
 # Print ENVVARs for debugging.
 ##
-echo "::debug::=========================================================="
+gh_debug "=========================================================="
 # Get the contents of the file which stores the location of the extracted IDE directories,
 # removing whitespace from the beginning & end of the string.
 IDE_DIRECTORIES=$(cat "$tmp_ide_directories" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-echo "::debug::IDE_DIRECTORIES => [$IDE_DIRECTORIES]"
-echo "::debug::=========================================================="
-echo "::debug::which java: $(which java)"
-echo "::debug::JAVA_HOME: $JAVA_HOME"
-echo "::debug::=========================================================="
-echo "::debug::Contents of \$HOME => [$HOME] :"
-ls -lash $HOME | sed 's/^/::debug::/'
-echo "::debug::=========================================================="
-echo "::debug::Contents of \$GITHUB_WORKSPACE => [$GITHUB_WORKSPACE] :"
-ls -lash $GITHUB_WORKSPACE | sed 's/^/::debug::/'
-echo "::debug::=========================================================="
-echo "::debug::Contents of \$PLUGIN_LOCATION => [$PLUGIN_LOCATION] :"
-ls -lash $PLUGIN_LOCATION | sed 's/^/::debug::/'
-echo "::debug::=========================================================="
-echo "::debug::Contents of the current directory => [$(pwd)] :"
-ls -lash "$(pwd)" | sed 's/^/::debug::/'
-echo "::debug::=========================================================="
-
-##
-# ================== DISK SPACE CHECK ==================
-##
-df -h | while read line; do echo "::debug::$line"; done
+gh_debug "IDE_DIRECTORIES => [$IDE_DIRECTORIES]"
+gh_debug "=========================================================="
+gh_debug "which java: $(which java)"
+gh_debug "JAVA_HOME: $JAVA_HOME"
+gh_debug "=========================================================="
+gh_debug "Contents of \$HOME => [$HOME] :"
+ls -lash $HOME | gh_debug
+gh_debug "=========================================================="
+gh_debug "Contents of \$GITHUB_WORKSPACE => [$GITHUB_WORKSPACE] :"
+ls -lash $GITHUB_WORKSPACE | gh_debug
+gh_debug "=========================================================="
+gh_debug "Contents of \$PLUGIN_LOCATION => [$PLUGIN_LOCATION] :"
+ls -lash $PLUGIN_LOCATION | gh_debug
+gh_debug "=========================================================="
+gh_debug "Contents of the current directory => [$(pwd)] :"
+ls -lash "$(pwd)" | gh_debug
+gh_debug "=========================================================="
 
 ##
 # Run the verification
@@ -222,7 +256,7 @@ df -h | while read line; do echo "::debug::$line"; done
 VERIFICATION_OUTPUT_LOG="verification_result.log"
 echo "Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..."
 
-echo "::debug::RUNNING COMMAND: java -jar \"$VERIFIER_JAR_LOCATION\" check-plugin $PLUGIN_LOCATION $IDE_DIRECTORIES"
+gh_debug "RUNNING COMMAND: java -jar \"$VERIFIER_JAR_LOCATION\" check-plugin $PLUGIN_LOCATION $IDE_DIRECTORIES"
 
 # We don't wrap $IDE_DIRECTORIES in quotes at the end of this to allow
 # the single string of args (ie, `"a b c"`) be broken into multiple
@@ -243,8 +277,7 @@ df -h | while read line; do echo "::debug::$line"; done
 
 echo "::set-output name=verification-output-log-filename::$VERIFICATION_OUTPUT_LOG"
 
-# Validate the log; fail if we find compatibility problems.
-if (grep -E -q "^Plugin (.*) against .*: .* compatibility problems?$" "$VERIFICATION_OUTPUT_LOG"); then
+error_wall() {
   echo "::error::=============================================="
   echo "::error::=============================================="
   echo "::error::===                                        ==="
@@ -253,6 +286,13 @@ if (grep -E -q "^Plugin (.*) against .*: .* compatibility problems?$" "$VERIFICA
   echo "::error::=============================================="
   echo "::error::=============================================="
   exit 1 # An error has occurred.
+}
+
+# Validate the log; fail if we find compatibility problems.
+if (grep -E -q "^Plugin (.*) against .*: .* compatibility problems?$" "$VERIFICATION_OUTPUT_LOG"); then
+  error_wall
+elif egrep -q "^The following files specified for the verification are not valid plugins:$" "$verification_log"; then
+  error_wall
 fi
 
 # Everything verified ok.

@@ -169,30 +169,26 @@ release_type_for() {
 }
 
 ##
-# ================== DISK SPACE CHECK ==================
-##
-df -h | while read line; do echo "::debug::$line"; done
-
-##
 # Setup
 ##
 
 echo "Downloading plugin verifier [version '$INPUT_VERIFIER_VERSION'] from [$VERIFIER_DOWNLOAD_URL] to [$VERIFIER_JAR_LOCATION]..."
 curl -L --silent --show-error --output "$VERIFIER_JAR_LOCATION" "$VERIFIER_DOWNLOAD_URL"
 
-##
-# ================== DISK SPACE CHECK ==================
-##
-df -h | while read line; do echo "::debug::$line"; done
-
 echo "::endgroup::" # END "Initializing..." block
 
 # temp file for storing IDE Directories we download and unzip
 tmp_ide_directories="/tmp/ide_directories.txt"
 
-echo "Processing all IDE versions..."
+# temp file for storing messages to display after the below loop
+# we use this, as each iteration has it's log messages hidden via
+# a log group, thus hiding the output from the user, so this way
+# it is more obvious to the user.
+post_loop_messages="/tmp/post_loop_messages.txt"
+
+echo "Preparing all IDE versions specified..."
 echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
-  echo "::group::Processing IDE:Version = \"$IDE_VERSION\""
+  echo "::group::Preparing [$IDE_VERSION]..."
   if [ -z "$IDE_VERSION" ]; then
     gh_debug "IDE_VERSION is empty; continuing with next iteration."
     break
@@ -214,30 +210,31 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
 
   ZIP_FILE_PATH="$HOME/$IDE-$VERSION.zip"
 
-  echo "Downloading [$DOWNLOAD_URL] into [$ZIP_FILE_PATH]..."
+  echo "Downloading $IDE $IDE_VERSION from [$DOWNLOAD_URL] into [$ZIP_FILE_PATH]..."
   curl -L --silent --show-error --output "$ZIP_FILE_PATH" "$DOWNLOAD_URL"
 
-  ##
-  # ================== DISK SPACE CHECK ==================
-  ##
-  df -h | while read line; do echo "::debug::$line"; done
-
-  gh_debug "Testing [$ZIP_FILE_PATH] to ensure valid file..."
+  gh_debug "Testing [$ZIP_FILE_PATH] to ensure it is a valid zip file..."
   # Turn off 'exit on error', as if we error out when testing the zip we want
   # to print a friendly message to the user and skip this version and proceed.
   set +o errexit
   zip -T "$ZIP_FILE_PATH"
   if [[ $? -eq 0 ]]; then
-    gh_debug "[$ZIP_FILE_PATH] appears to be a valid file. Proceeding..."
+    gh_debug "[$ZIP_FILE_PATH] appears to be a valid zip file. Proceeding..."
   else
-    echo "::warning::It appears $ZIP_FILE_PATH is not a valid zip file."
-    echo "::warning::"
-    echo "::warning::This can happen when the download did not work properly, or if $IDE_VERSION is"
-    echo "::warning::not a valid IDE / version. If you believe it is a valid version, please open"
-    echo "::warning::an issue on GitHub:"
-    echo "::warning::     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/issues/new"
-    echo "::warning::"
-    echo "::warning::For the time being, this IDE / Version is being skipped."
+    message=$(cat <<EOF
+::warning::=======================================================================================
+::warning::It appears $ZIP_FILE_PATH is not a valid zip file.
+::warning::
+::warning::This can happen when the download did not work properly, or if $IDE_VERSION is
+::warning::not a valid IDE / version. If you believe it is a valid version, please open
+::warning::an issue on GitHub:
+::warning::     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/issues/new
+::warning::
+::warning::For the time being, this IDE / Version is being skipped.
+::warning::=======================================================================================
+EOF)
+    # Print the message once in this log group, and then save for after so it's more visible to the user.
+    echo "$message" ; echo "$message" >> $post_loop_messages
     continue
   fi
   # Restore 'exit on error', as the test is over.
@@ -248,24 +245,18 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   mkdir -p "$IDE_EXTRACT_LOCATION"
   unzip -q -d "$IDE_EXTRACT_LOCATION" "$ZIP_FILE_PATH"
 
-  ##
-  # ================== DISK SPACE CHECK ==================
-  ##
-  df -h | while read line; do echo "::debug::$line"; done
-
   gh_debug "Removing [$ZIP_FILE_PATH] to save storage space..."
   rm "$ZIP_FILE_PATH"
 
-  ##
-  # ================== DISK SPACE CHECK ==================
-  ##
-  df -h | while read line; do echo "::debug::$line"; done
-
   # Append the extracted location to the variable of IDEs to validate against.
   gh_debug "Adding $IDE_EXTRACT_LOCATION to '$tmp_ide_directories'..."
-  printf "%s " "$IDE_EXTRACT_LOCATION" >>$tmp_ide_directories
+  printf "%s " "$IDE_EXTRACT_LOCATION" >> $tmp_ide_directories
   echo "::endgroup::" # END "Processing IDE:Version = \"$IDE_VERSION\"" block.
 done
+
+# Print any messages from the loop - we do this outside of the loop so that
+# any warning / error messages are not masked by the log group.
+cat $post_loop_messages
 
 ##
 # Print ENVVARs for debugging.
@@ -291,6 +282,7 @@ gh_debug "=========================================================="
 gh_debug "Contents of the current directory => [$(pwd)] :"
 ls -lash "$(pwd)" | gh_debug
 gh_debug "=========================================================="
+echo "::endgroup::" # END "Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..." block.
 
 ##
 # Run the verification
@@ -313,11 +305,6 @@ gh_debug "RUNNING COMMAND: java -jar \"$VERIFIER_JAR_LOCATION\" check-plugin $PL
 java -jar "$VERIFIER_JAR_LOCATION" check-plugin $PLUGIN_LOCATION $IDE_DIRECTORIES 2>&1 | tee "$VERIFICATION_OUTPUT_LOG"
 
 echo "::endgroup::" # END "Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..." block.
-
-##
-# ================== DISK SPACE CHECK ==================
-##
-df -h | while read line; do echo "::debug::$line"; done
 
 echo "::set-output name=verification-output-log-filename::$VERIFICATION_OUTPUT_LOG"
 

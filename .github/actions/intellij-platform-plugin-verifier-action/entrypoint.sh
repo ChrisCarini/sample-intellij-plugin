@@ -17,7 +17,8 @@
 #             - ACTIONS_STEP_DEBUG to true
 ###
 
-set -eu
+set -o errexit
+set -o nounset
 
 ##
 # GitHub Debug Function
@@ -65,6 +66,8 @@ INPUT_PLUGIN_LOCATION="$2"
 # ide-versions: ['ideaIU:2019.3.4','ideaIC:2019.3.4','pycharmPC:2019.3.4','goland:2019.3.3','clion:2019.3.4']
 INPUT_IDE_VERSIONS="$3"
 
+echo "::group::Initializing..."
+
 gh_debug "INPUT_VERIFIER_VERSION => $INPUT_VERIFIER_VERSION"
 gh_debug "INPUT_PLUGIN_LOCATION => $INPUT_PLUGIN_LOCATION"
 gh_debug "INPUT_IDE_VERSIONS =>"
@@ -102,7 +105,7 @@ fi
 if [[ "$INPUT_VERIFIER_VERSION" == "LATEST" ]]; then
     gh_debug "LATEST verifier version found, resolving version..."
     GH_LATEST_RELEASE_FILE="$HOME/intellij-plugin-verifier_latest_gh_release.json"
-    curl -s https://api.github.com/repos/JetBrains/intellij-plugin-verifier/releases/latest > "$GH_LATEST_RELEASE_FILE"
+    curl --silent --show-error https://api.github.com/repos/JetBrains/intellij-plugin-verifier/releases/latest > "$GH_LATEST_RELEASE_FILE"
     VERIFIER_VERSION=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .tag_name | sed 's/[^[:digit:].]*//g')
     VERIFIER_DOWNLOAD_URL=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].browser_download_url)
     VERIFIER_JAR_FILENAME=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].name)
@@ -175,19 +178,21 @@ df -h | while read line; do echo "::debug::$line"; done
 ##
 
 echo "Downloading plugin verifier [version '$INPUT_VERIFIER_VERSION'] from [$VERIFIER_DOWNLOAD_URL] to [$VERIFIER_JAR_LOCATION]..."
-curl -L --output "$VERIFIER_JAR_LOCATION" "$VERIFIER_DOWNLOAD_URL"
+curl -L --silent --show-error --output "$VERIFIER_JAR_LOCATION" "$VERIFIER_DOWNLOAD_URL"
 
 ##
 # ================== DISK SPACE CHECK ==================
 ##
 df -h | while read line; do echo "::debug::$line"; done
 
+echo "::endgroup::" # END "Initializing..." block
+
 # temp file for storing IDE Directories we download and unzip
 tmp_ide_directories="/tmp/ide_directories.txt"
 
 echo "Processing all IDE versions..."
 echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
-  echo "Processing IDE:Version = \"$IDE_VERSION\""
+  echo "::group::Processing IDE:Version = \"$IDE_VERSION\""
   if [ -z "$IDE_VERSION" ]; then
     gh_debug "IDE_VERSION is empty; continuing with next iteration."
     break
@@ -210,12 +215,33 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   ZIP_FILE_PATH="$HOME/$IDE-$VERSION.zip"
 
   echo "Downloading [$DOWNLOAD_URL] into [$ZIP_FILE_PATH]..."
-  curl -L --output "$ZIP_FILE_PATH" "$DOWNLOAD_URL"
+  curl -L --silent --show-error --output "$ZIP_FILE_PATH" "$DOWNLOAD_URL"
 
   ##
   # ================== DISK SPACE CHECK ==================
   ##
   df -h | while read line; do echo "::debug::$line"; done
+
+  gh_debug "Testing [$ZIP_FILE_PATH] to ensure valid file..."
+  # Turn off 'exit on error', as if we error out when testing the zip we want
+  # to print a friendly message to the user and skip this version and proceed.
+  set +o errexit
+  zip -T "$ZIP_FILE_PATH"
+  if [[ $? -eq 0 ]]; then
+    gh_debug "[$ZIP_FILE_PATH] appears to be a valid file. Proceeding..."
+  else
+    echo "::warning::It appears $ZIP_FILE_PATH is not a valid zip file."
+    echo "::warning::"
+    echo "::warning::This can happen when the download did not work properly, or if $IDE_VERSION is"
+    echo "::warning::not a valid IDE / version. If you believe it is a valid version, please open"
+    echo "::warning::an issue on GitHub:"
+    echo "::warning::     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/issues/new"
+    echo "::warning::"
+    echo "::warning::For the time being, this IDE / Version is being skipped."
+    continue
+  fi
+  # Restore 'exit on error', as the test is over.
+  set -o errexit
 
   IDE_EXTRACT_LOCATION="$HOME/ides/$IDE-$VERSION"
   echo "Extracting [$ZIP_FILE_PATH] into [$IDE_EXTRACT_LOCATION]..."
@@ -238,6 +264,7 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   # Append the extracted location to the variable of IDEs to validate against.
   gh_debug "Adding $IDE_EXTRACT_LOCATION to '$tmp_ide_directories'..."
   printf "%s " "$IDE_EXTRACT_LOCATION" >>$tmp_ide_directories
+  echo "::endgroup::" # END "Processing IDE:Version = \"$IDE_VERSION\"" block.
 done
 
 ##
@@ -269,7 +296,7 @@ gh_debug "=========================================================="
 # Run the verification
 ##
 VERIFICATION_OUTPUT_LOG="verification_result.log"
-echo "Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..."
+echo "::group::Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..."
 
 gh_debug "RUNNING COMMAND: java -jar \"$VERIFIER_JAR_LOCATION\" check-plugin $PLUGIN_LOCATION $IDE_DIRECTORIES"
 
@@ -284,6 +311,8 @@ gh_debug "RUNNING COMMAND: java -jar \"$VERIFIER_JAR_LOCATION\" check-plugin $PL
 #
 # shellcheck disable=SC2086
 java -jar "$VERIFIER_JAR_LOCATION" check-plugin $PLUGIN_LOCATION $IDE_DIRECTORIES 2>&1 | tee "$VERIFICATION_OUTPUT_LOG"
+
+echo "::endgroup::" # END "Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..." block.
 
 ##
 # ================== DISK SPACE CHECK ==================

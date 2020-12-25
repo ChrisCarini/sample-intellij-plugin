@@ -23,7 +23,7 @@ set -eu
 # GitHub Debug Function
 ##
 gh_debug() {
-  if [[ "$#" -eq 0 ]]; then
+  if [[ "$#" -eq 0 ]] ; then
     while read line; do
       echo "::debug::${line}"
     done
@@ -69,9 +69,10 @@ gh_debug "INPUT_VERIFIER_VERSION => $INPUT_VERIFIER_VERSION"
 gh_debug "INPUT_PLUGIN_LOCATION => $INPUT_PLUGIN_LOCATION"
 gh_debug "INPUT_IDE_VERSIONS =>"
 echo "$INPUT_IDE_VERSIONS" | while read -r INPUT_IDE_VERSION; do
-  gh_debug "                   => $INPUT_IDE_VERSION"
+gh_debug "                   => $INPUT_IDE_VERSION"
 done
 
+# If the user passed in a file instead of a list, pull the IDE+version combos from the file and use that instead.
 if [[ -f "$GITHUB_WORKSPACE/$INPUT_IDE_VERSIONS" ]]; then
   gh_debug "$INPUT_IDE_VERSIONS is a file. Extracting file contents into variable."
   INPUT_IDE_VERSIONS=$(cat "$INPUT_IDE_VERSIONS")
@@ -81,23 +82,37 @@ if [[ -f "$GITHUB_WORKSPACE/$INPUT_IDE_VERSIONS" ]]; then
   done
 fi
 
+# Check if there are duplicate entries in the list of IDE_VERSIONS, if so, error out and show the user a clear message
+detect=$(printf '%s\n' "${INPUT_IDE_VERSIONS[@]}"|awk '!($0 in seen){seen[$0];next} 1')
+if [[ ${#detect} -gt 8 ]] ; then
+    echo "::error::Duplicate ide-versions found:"
+    echo "$detect" | while read -r INPUT_IDE_VERSION; do
+      echo "::error::        => $INPUT_IDE_VERSION"
+    done
+    echo "::error::"
+    echo "::error::Please remove the duplicate entries before proceeding."
+    exit 1 # An error has occurred - duplicate ide-version entries found.
+else
+    gh_debug "No duplicate IDE_VERSIONS found, proceeding..."
+fi
+
 ##
 # Resolve verifier values
 ##
 if [[ "$INPUT_VERIFIER_VERSION" == "LATEST" ]]; then
-  gh_debug "LATEST verifier version found, resolving version..."
-  GH_LATEST_RELEASE_FILE="$HOME/intellij-plugin-verifier_latest_gh_release.json"
-  curl -s https://api.github.com/repos/JetBrains/intellij-plugin-verifier/releases/latest >"$GH_LATEST_RELEASE_FILE"
-  VERIFIER_VERSION=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .tag_name | sed 's/[^[:digit:].]*//g')
-  VERIFIER_DOWNLOAD_URL=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].browser_download_url)
-  VERIFIER_JAR_FILENAME=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].name)
+    gh_debug "LATEST verifier version found, resolving version..."
+    GH_LATEST_RELEASE_FILE="$HOME/intellij-plugin-verifier_latest_gh_release.json"
+    curl -s https://api.github.com/repos/JetBrains/intellij-plugin-verifier/releases/latest > "$GH_LATEST_RELEASE_FILE"
+    VERIFIER_VERSION=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .tag_name | sed 's/[^[:digit:].]*//g')
+    VERIFIER_DOWNLOAD_URL=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].browser_download_url)
+    VERIFIER_JAR_FILENAME=$(cat "$GH_LATEST_RELEASE_FILE" | jq -r .assets[].name)
 else
-  gh_debug "Using verifier version [$INPUT_VERIFIER_VERSION]..."
+    gh_debug "Using verifier version [$INPUT_VERIFIER_VERSION]..."
 
-  VERIFIER_VERSION=${INPUT_VERIFIER_VERSION}
-  VERIFIER_DOWNLOAD_URL="https://dl.bintray.com/jetbrains/intellij-plugin-service/org/jetbrains/intellij/plugins/verifier-cli/$INPUT_VERIFIER_VERSION/$VERIFIER_JAR_FILENAME"
-  # The filename of the `verifier-cli-*-all.jar` file
-  VERIFIER_JAR_FILENAME="verifier-cli-$VERIFIER_VERSION-all.jar"
+    VERIFIER_VERSION=${INPUT_VERIFIER_VERSION}
+    VERIFIER_DOWNLOAD_URL="https://dl.bintray.com/jetbrains/intellij-plugin-service/org/jetbrains/intellij/plugins/verifier-cli/$INPUT_VERIFIER_VERSION/$VERIFIER_JAR_FILENAME"
+    # The filename of the `verifier-cli-*-all.jar` file
+    VERIFIER_JAR_FILENAME="verifier-cli-$VERIFIER_VERSION-all.jar"
 fi
 
 # The full path of the `verifier-cli-*-all.jar` file
@@ -212,7 +227,7 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   ##
   df -h | while read line; do echo "::debug::$line"; done
 
-  echo "::debug::Removing [$ZIP_FILE_PATH] to save storage space..."
+  gh_debug "Removing [$ZIP_FILE_PATH] to save storage space..."
   rm "$ZIP_FILE_PATH"
 
   ##
@@ -285,13 +300,13 @@ error_wall() {
   echo "::error::===                                        ==="
   echo "::error::=============================================="
   echo "::error::=============================================="
-  exit 1 # An error has occurred.
+  exit 1 # An error has occurred - plugin verification failure.
 }
 
 # Validate the log; fail if we find compatibility problems.
-if (grep -E -q "^Plugin (.*) against .*: .* compatibility problems?$" "$VERIFICATION_OUTPUT_LOG"); then
+if (grep -E -q "^Plugin (.*) against .*: .* compatibility problems?" "$VERIFICATION_OUTPUT_LOG"); then
   error_wall
-elif egrep -q "^The following files specified for the verification are not valid plugins:$" "$verification_log"; then
+elif egrep -q "^The following files specified for the verification are not valid plugins:$" "$VERIFICATION_OUTPUT_LOG"; then
   error_wall
 fi
 

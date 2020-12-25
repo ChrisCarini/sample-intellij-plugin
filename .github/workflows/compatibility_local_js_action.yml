@@ -1,4 +1,4 @@
-name: IntelliJ Plugin Compatibility (local JS action)
+name: IJ Plugin Compatibility (local JS action)
 
 on:
   push:
@@ -26,9 +26,18 @@ jobs:
 
       - name: Verify Plugin on IntelliJ Platforms
         id: verify
-        uses: ./.github/actions/intellij-platform-plugin-verifier-action
+        uses: ./.github/actions/intellij-plugin-verifier-github-action
         with:
-          ide-versions: .github/actions/intellij-platform-plugin-verifier-action/sample_ide_versions_file.txt
+          ide-versions: |
+            ideaIC:2017.1
+            ideaIC:2017.1
+            ideaIC:2017.3
+            ideaIC:2020.1
+            ideaIU:2020.1
+            ideaIU:2020.1
+            ideaIC:LATEST-EAP-SNAPSHOT
+            ideaIC:LATEST-EAP-SNAPSHOT
+            ideaIU:LATEST-EAP-SNAPSHOT
 
       - name: Get log file path and print contents
         run: |

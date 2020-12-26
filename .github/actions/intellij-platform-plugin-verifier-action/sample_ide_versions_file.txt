@@ -1,4 +1,4 @@
-ideaIC:2020.1
 ideaIC:2020.4
+ideaIC:2020.1
 ideaIU:2020.2
 ideaIC:LATEST-EAP-SNAPSHOT

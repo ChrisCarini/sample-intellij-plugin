@@ -21,7 +21,7 @@ set -o errexit
 set -o nounset
 
 ##
-# GitHub Debug Function
+# GitHub Debug Functions
 ##
 gh_debug() {
   if [[ "$#" -eq 0 ]] ; then
@@ -31,6 +31,30 @@ gh_debug() {
   else
     echo "::debug::${1}"
   fi
+}
+
+trap 'exit_trap $? $LINENO' EXIT
+exit_trap() {
+  gh_debug "Script exited with status $1 on line $2"
+  case $1 in
+    0)  gh_debug "Goodbye." ;;
+    1)  gh_debug "Exiting due to plugin validation failure." ;;
+    64) gh_debug "Exiting due to a known, handled exception." ;;
+
+    *) cat <<EOF
+====================================================
+echo "Error $1 occurred on $2"
+====================================================
+EOF
+      ;;
+  esac
+}
+
+gh_debug_disk_space() {
+  ##
+  # ================== DISK SPACE CHECK ==================
+  ##
+  df -h | gh_debug
 }
 
 ##
@@ -94,7 +118,7 @@ if [[ ${#detect} -gt 8 ]] ; then
     done
     echo "::error::"
     echo "::error::Please remove the duplicate entries before proceeding."
-    exit 1 # An error has occurred - duplicate ide-version entries found.
+    exit 64 # An error has occurred - duplicate ide-version entries found.
 else
     gh_debug "No duplicate IDE_VERSIONS found, proceeding..."
 fi
@@ -168,12 +192,16 @@ release_type_for() {
   esac
 }
 
+gh_debug_disk_space
+
 ##
 # Setup
 ##
 
 echo "Downloading plugin verifier [version '$INPUT_VERIFIER_VERSION'] from [$VERIFIER_DOWNLOAD_URL] to [$VERIFIER_JAR_LOCATION]..."
 curl -L --silent --show-error --output "$VERIFIER_JAR_LOCATION" "$VERIFIER_DOWNLOAD_URL"
+
+gh_debug_disk_space
 
 echo "::endgroup::" # END "Initializing..." block
 
@@ -211,7 +239,38 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   ZIP_FILE_PATH="$HOME/$IDE-$VERSION.zip"
 
   echo "Downloading $IDE $IDE_VERSION from [$DOWNLOAD_URL] into [$ZIP_FILE_PATH]..."
-  curl -L --silent --show-error --output "$ZIP_FILE_PATH" "$DOWNLOAD_URL"
+  CURL_RESP=$(curl -L --silent --show-error -w 'HTTP/%{http_code} - content-type: %{content_type}' --output "$ZIP_FILE_PATH" "$DOWNLOAD_URL")
+
+  gh_debug_disk_space
+
+  gh_debug "Checking headers for the download of [$DOWNLOAD_URL] to ensure download successful..."
+  # Turn off 'exit on error', as if we error out when testing the zip we want
+  # to print a friendly message to the user and skip this version and proceed.
+  set +o errexit
+  echo "$CURL_RESP" | grep "HTTP/200 - content-type: application/octet-stream"
+  if [[ $? -eq 0 ]]; then
+    gh_debug "Download of [$DOWNLOAD_URL] to [$ZIP_FILE_PATH] was successful."
+  else
+    read -r -d '' message <<EOF
+::error::=======================================================================================
+::error::It appears the download of $DOWNLOAD_URL did not contain the following:
+::error::    - status: 200
+::error::    - content-type: application/octet-stream
+::error::
+::error::Actual response: $CURL_RESP
+::error::
+::error::This can happen if $IDE_VERSION is not a valid IDE / version. If you believe it is a
+::error::valid ide/version, please open an issue on GitHub:
+::error::     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/issues/new
+::error::
+::error::As a precaution, we are failing this execution.
+::error::=======================================================================================
+EOF
+    echo "$message" ; echo "$message" >> $post_loop_messages
+    exit 64 # An error has occurred - invalid download headers.
+  fi
+  # Restore 'exit on error', as the test is over.
+  set -o errexit
 
   gh_debug "Testing [$ZIP_FILE_PATH] to ensure it is a valid zip file..."
   # Turn off 'exit on error', as if we error out when testing the zip we want
@@ -221,21 +280,20 @@ echo "$INPUT_IDE_VERSIONS" | while read -r IDE_VERSION; do
   if [[ $? -eq 0 ]]; then
     gh_debug "[$ZIP_FILE_PATH] appears to be a valid zip file. Proceeding..."
   else
-    message=$(cat <<EOF
-::warning::=======================================================================================
-::warning::It appears $ZIP_FILE_PATH is not a valid zip file.
-::warning::
-::warning::This can happen when the download did not work properly, or if $IDE_VERSION is
-::warning::not a valid IDE / version. If you believe it is a valid version, please open
-::warning::an issue on GitHub:
-::warning::     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/issues/new
-::warning::
-::warning::For the time being, this IDE / Version is being skipped.
-::warning::=======================================================================================
-EOF)
-    # Print the message once in this log group, and then save for after so it's more visible to the user.
+    read -r -d '' message <<EOF
+::error::=======================================================================================
+::error::It appears $ZIP_FILE_PATH is not a valid zip file.
+::error::
+::error::This can happen when the download did not work properly, or if $IDE_VERSION is
+::error::not a valid IDE / version. If you believe it is a valid version, please open
+::error::an issue on GitHub:
+::error::     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/issues/new
+::error::
+::error::For the time being, this IDE / Version is being skipped.
+::error::=======================================================================================
+EOF
     echo "$message" ; echo "$message" >> $post_loop_messages
-    continue
+    exit 64 # An error has occurred - invalid zip file.
   fi
   # Restore 'exit on error', as the test is over.
   set -o errexit
@@ -245,8 +303,12 @@ EOF)
   mkdir -p "$IDE_EXTRACT_LOCATION"
   unzip -q -d "$IDE_EXTRACT_LOCATION" "$ZIP_FILE_PATH"
 
+  gh_debug_disk_space
+
   gh_debug "Removing [$ZIP_FILE_PATH] to save storage space..."
   rm "$ZIP_FILE_PATH"
+
+  gh_debug_disk_space
 
   # Append the extracted location to the variable of IDEs to validate against.
   gh_debug "Adding $IDE_EXTRACT_LOCATION to '$tmp_ide_directories'..."
@@ -305,6 +367,8 @@ gh_debug "RUNNING COMMAND: java -jar \"$VERIFIER_JAR_LOCATION\" check-plugin $PL
 java -jar "$VERIFIER_JAR_LOCATION" check-plugin $PLUGIN_LOCATION $IDE_DIRECTORIES 2>&1 | tee "$VERIFICATION_OUTPUT_LOG"
 
 echo "::endgroup::" # END "Running verification on $PLUGIN_LOCATION for $IDE_DIRECTORIES..." block.
+
+gh_debug_disk_space
 
 echo "::set-output name=verification-output-log-filename::$VERIFICATION_OUTPUT_LOG"
 

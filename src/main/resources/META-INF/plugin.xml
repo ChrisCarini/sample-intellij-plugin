@@ -26,4 +26,12 @@
             <add-to-group group-id="SamplePlugin.SampleMenu" anchor="first"/>
         </action>
     </actions>
+
+    <application-components>
+        <component>
+            <implementation-class>
+                com.chriscarini.jetbrains.sampleintellijplugin.actions.FocusPowerSaveService
+            </implementation-class>
+        </component>
+    </application-components>
 </idea-plugin>

@@ -1,0 +1,46 @@
+Starting the IntelliJ Plugin Verifier null
+Verification reports directory: verification-2020-05-17 at 09.12.05
+2020-05-17T09:12:05 [main] INFO  verification - Reading IDE /home/runner/ides/ideaIC-2017.1
+2020-05-17T09:12:07 [main] INFO  verification - Reading IDE /home/runner/ides/ideaIC-2017.3
+2020-05-17T09:12:08 [main] INFO  verification - Reading IDE /home/runner/ides/ideaIC-2020.1
+2020-05-17T09:12:10 [main] INFO  verification - Reading IDE /home/runner/ides/ideaIU-2020.1
+2020-05-17T09:12:13 [main] INFO  verification - Reading IDE /home/runner/ides/ideaIC-LATEST-EAP-SNAPSHOT
+2020-05-17T09:12:14 [main] INFO  verification - Reading IDE /home/runner/ides/ideaIU-LATEST-EAP-SNAPSHOT
+2020-05-17T09:12:15 [main] INFO  verification - Reading plugin to check from /home/runner/work/sample-intellij-plugin/sample-intellij-plugin/build/distributions/sample-intellij-plugin-0.2.1.zip
+2020-05-17T09:12:16 [main] INFO  verification - Task check-plugin parameters:
+Scheduled verifications (6):
+com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-171.3780.107, com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-173.3727.127, com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-201.6668.121, com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IU-201.6668.121, com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-201.7846.6, com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IU-201.7846.6
+
+2020-05-17T09:12:17 [main] INFO  verification - Finished 1 of 6 verifications (in 0.3 s): IC-173.3727.127 against com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1: 1 compatibility problem
+2020-05-17T09:12:17 [main] INFO  verification - Finished 2 of 6 verifications (in 0.3 s): IU-201.6668.121 against com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1: Compatible
+2020-05-17T09:12:17 [main] INFO  verification - Finished 3 of 6 verifications (in 0.3 s): IC-201.6668.121 against com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1: Compatible
+2020-05-17T09:12:17 [main] INFO  verification - Finished 4 of 6 verifications (in 0.3 s): IC-171.3780.107 against com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1: 1 compatibility problem
+2020-05-17T09:12:17 [main] INFO  verification - Finished 5 of 6 verifications (in 0.1 s): IU-201.7846.6 against com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1: Compatible
+2020-05-17T09:12:17 [main] INFO  verification - Finished 6 of 6 verifications (in 0.1 s): IC-201.7846.6 against com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1: Compatible
+Plugin com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-173.3727.127: 1 compatibility problem
+Compatibility problems (1):
+    #Access to unresolved class com.intellij.ide.ui.ProductIcons
+        Constructor com.chriscarini.jetbrains.sampleintellijplugin.actions.HelloAction.<init>() references an unresolved class com.intellij.ide.ui.ProductIcons. This can lead to **NoSuchClassError** exception at runtime.
+    Plugin can be loaded/unloaded without IDE restart
+
+Plugin com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IU-201.6668.121: Compatible
+    Plugin can be loaded/unloaded without IDE restart
+
+Plugin com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-201.6668.121: Compatible
+    Plugin can be loaded/unloaded without IDE restart
+
+Plugin com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-171.3780.107: 1 compatibility problem
+Compatibility problems (1):
+    #Access to unresolved class com.intellij.ide.ui.ProductIcons
+        Constructor com.chriscarini.jetbrains.sampleintellijplugin.actions.HelloAction.<init>() references an unresolved class com.intellij.ide.ui.ProductIcons. This can lead to **NoSuchClassError** exception at runtime.
+    Plugin can be loaded/unloaded without IDE restart
+
+Plugin com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IU-201.7846.6: Compatible
+    Plugin can be loaded/unloaded without IDE restart
+
+Plugin com.chriscarini.jetbrains.sample-intellij-plugin:0.2.1 against IC-201.7846.6: Compatible
+    Plugin can be loaded/unloaded without IDE restart
+
+2020-05-17T09:12:17 [main] INFO  verification - Total time spent downloading plugins and their dependencies: 0 ms
+2020-05-17T09:12:17 [main] INFO  verification - Total amount of plugins and dependencies downloaded: 0 B
+2020-05-17T09:12:17 [main] INFO  verification - Total amount of space used for plugins and dependencies: 0 B

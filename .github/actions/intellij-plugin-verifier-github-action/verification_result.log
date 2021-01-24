@@ -1,0 +1,88 @@
+Starting the IntelliJ Plugin Verifier null
+Verification reports directory: verification-2020-05-16 at 21.45.56
+2020-05-16T21:45:57 [main] INFO  verification - Reading IDE /Users/ccarini/ides/ideaIU-2019.3.4
+2020-05-16T21:46:01 [main] ERROR LanguageUtils - Failed attempt #1 of 5 to invoke 'All versions of plugin '/build/distributions/sample-intellij-plugin-*' compatible with IU-193.6911.18'. Wait for 30000 millis to reattempt
+org.jetbrains.intellij.pluginRepository.PluginRepositoryException: <!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1>HTTP Status 400 – Bad Request</h1></body></html>
+Bad Request
+Request failed. Status code 400.
+	at org.jetbrains.intellij.pluginRepository.internal.utils.RequestHelperKt.executeAndParseBody(RequestHelper.kt:30)
+	at org.jetbrains.intellij.pluginRepository.internal.instances.PluginManagerInstance.getPluginByXmlId(PluginManagerInstance.kt:24)
+	at org.jetbrains.intellij.pluginRepository.PluginManager$DefaultImpls.getPluginByXmlId$default(PluginRepository.kt:18)
+	at com.jetbrains.pluginverifier.repository.repositories.marketplace.MarketplaceRepository.getAllVersionsOfPlugin(MarketplaceRepository.kt:54)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:163)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:26)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry(RetryUtil.kt:22)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry$default(RetryUtil.kt:17)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addAllCompatibleVersionsOfPlugin(PluginsParsing.kt:162)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addPluginBySpec(PluginsParsing.kt:135)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:54)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:23)
+	at com.jetbrains.pluginverifier.PluginVerifierMain.main(PluginVerifierMain.kt:126)
+2020-05-16T21:46:32 [main] ERROR LanguageUtils - Failed attempt #2 of 5 to invoke 'All versions of plugin '/build/distributions/sample-intellij-plugin-*' compatible with IU-193.6911.18'. Wait for 30000 millis to reattempt
+org.jetbrains.intellij.pluginRepository.PluginRepositoryException: <!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1>HTTP Status 400 – Bad Request</h1></body></html>
+Bad Request
+Request failed. Status code 400.
+	at org.jetbrains.intellij.pluginRepository.internal.utils.RequestHelperKt.executeAndParseBody(RequestHelper.kt:30)
+	at org.jetbrains.intellij.pluginRepository.internal.instances.PluginManagerInstance.getPluginByXmlId(PluginManagerInstance.kt:24)
+	at org.jetbrains.intellij.pluginRepository.PluginManager$DefaultImpls.getPluginByXmlId$default(PluginRepository.kt:18)
+	at com.jetbrains.pluginverifier.repository.repositories.marketplace.MarketplaceRepository.getAllVersionsOfPlugin(MarketplaceRepository.kt:54)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:163)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:26)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry(RetryUtil.kt:22)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry$default(RetryUtil.kt:17)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addAllCompatibleVersionsOfPlugin(PluginsParsing.kt:162)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addPluginBySpec(PluginsParsing.kt:135)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:54)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:23)
+	at com.jetbrains.pluginverifier.PluginVerifierMain.main(PluginVerifierMain.kt:126)
+2020-05-16T21:47:02 [main] ERROR LanguageUtils - Failed attempt #3 of 5 to invoke 'All versions of plugin '/build/distributions/sample-intellij-plugin-*' compatible with IU-193.6911.18'. Wait for 30000 millis to reattempt
+org.jetbrains.intellij.pluginRepository.PluginRepositoryException: <!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1>HTTP Status 400 – Bad Request</h1></body></html>
+Bad Request
+Request failed. Status code 400.
+	at org.jetbrains.intellij.pluginRepository.internal.utils.RequestHelperKt.executeAndParseBody(RequestHelper.kt:30)
+	at org.jetbrains.intellij.pluginRepository.internal.instances.PluginManagerInstance.getPluginByXmlId(PluginManagerInstance.kt:24)
+	at org.jetbrains.intellij.pluginRepository.PluginManager$DefaultImpls.getPluginByXmlId$default(PluginRepository.kt:18)
+	at com.jetbrains.pluginverifier.repository.repositories.marketplace.MarketplaceRepository.getAllVersionsOfPlugin(MarketplaceRepository.kt:54)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:163)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:26)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry(RetryUtil.kt:22)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry$default(RetryUtil.kt:17)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addAllCompatibleVersionsOfPlugin(PluginsParsing.kt:162)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addPluginBySpec(PluginsParsing.kt:135)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:54)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:23)
+	at com.jetbrains.pluginverifier.PluginVerifierMain.main(PluginVerifierMain.kt:126)
+2020-05-16T21:47:32 [main] ERROR LanguageUtils - Failed attempt #4 of 5 to invoke 'All versions of plugin '/build/distributions/sample-intellij-plugin-*' compatible with IU-193.6911.18'. Wait for 30000 millis to reattempt
+org.jetbrains.intellij.pluginRepository.PluginRepositoryException: <!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1>HTTP Status 400 – Bad Request</h1></body></html>
+Bad Request
+Request failed. Status code 400.
+	at org.jetbrains.intellij.pluginRepository.internal.utils.RequestHelperKt.executeAndParseBody(RequestHelper.kt:30)
+	at org.jetbrains.intellij.pluginRepository.internal.instances.PluginManagerInstance.getPluginByXmlId(PluginManagerInstance.kt:24)
+	at org.jetbrains.intellij.pluginRepository.PluginManager$DefaultImpls.getPluginByXmlId$default(PluginRepository.kt:18)
+	at com.jetbrains.pluginverifier.repository.repositories.marketplace.MarketplaceRepository.getAllVersionsOfPlugin(MarketplaceRepository.kt:54)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:163)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:26)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry(RetryUtil.kt:22)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry$default(RetryUtil.kt:17)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addAllCompatibleVersionsOfPlugin(PluginsParsing.kt:162)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addPluginBySpec(PluginsParsing.kt:135)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:54)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:23)
+	at com.jetbrains.pluginverifier.PluginVerifierMain.main(PluginVerifierMain.kt:126)
+2020-05-16T21:48:03 [main] ERROR LanguageUtils - Failed attempt #5 of 5 to invoke 'All versions of plugin '/build/distributions/sample-intellij-plugin-*' compatible with IU-193.6911.18'. Wait for 30000 millis to reattempt
+org.jetbrains.intellij.pluginRepository.PluginRepositoryException: <!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D76;} h1 {font-size:22px;} h2 {font-size:16px;} h3 {font-size:14px;} p {font-size:12px;} a {color:black;} .line {height:1px;background-color:#525D76;border:none;}</style></head><body><h1>HTTP Status 400 – Bad Request</h1></body></html>
+Bad Request
+Request failed. Status code 400.
+	at org.jetbrains.intellij.pluginRepository.internal.utils.RequestHelperKt.executeAndParseBody(RequestHelper.kt:30)
+	at org.jetbrains.intellij.pluginRepository.internal.instances.PluginManagerInstance.getPluginByXmlId(PluginManagerInstance.kt:24)
+	at org.jetbrains.intellij.pluginRepository.PluginManager$DefaultImpls.getPluginByXmlId$default(PluginRepository.kt:18)
+	at com.jetbrains.pluginverifier.repository.repositories.marketplace.MarketplaceRepository.getAllVersionsOfPlugin(MarketplaceRepository.kt:54)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:163)
+	at com.jetbrains.pluginverifier.options.PluginsParsing$addAllCompatibleVersionsOfPlugin$compatibleVersions$1.invoke(PluginsParsing.kt:26)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry(RetryUtil.kt:22)
+	at com.jetbrains.pluginverifier.misc.RetryUtilKt.retry$default(RetryUtil.kt:17)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addAllCompatibleVersionsOfPlugin(PluginsParsing.kt:162)
+	at com.jetbrains.pluginverifier.options.PluginsParsing.addPluginBySpec(PluginsParsing.kt:135)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:54)
+	at com.jetbrains.pluginverifier.tasks.checkPlugin.CheckPluginParamsBuilder.build(CheckPluginParamsBuilder.kt:23)
+	at com.jetbrains.pluginverifier.PluginVerifierMain.main(PluginVerifierMain.kt:126)

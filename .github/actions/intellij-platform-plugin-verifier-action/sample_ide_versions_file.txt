@@ -1,2 +1,2 @@
-ideaIC:2018.3.6
+ideaIC:2021.1
 ideaIC:LATEST-EAP-SNAPSHOT

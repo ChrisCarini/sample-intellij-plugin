@@ -5,7 +5,7 @@ on:
 
 jobs:
   compatibility:
-    name: 2020.1 & the latest EAP snapshot for both IDEA Community, IDEA Ultimate.
+    name: 2021.1 & the latest EAP snapshot for both IDEA Community, IDEA Ultimate.
 
     runs-on: ubuntu-latest
 

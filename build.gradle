@@ -1,5 +1,6 @@
 import java.util.stream.Collectors
 import org.jetbrains.changelog.ExtensionsKt
+import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
 
 String properties(String key) { return project.findProperty(key).toString() }
 
@@ -14,8 +15,6 @@ apply plugin: 'org.jetbrains.changelog'
 group properties("pluginGroup")
 version properties("pluginVersion")
 
-sourceCompatibility = properties("javaVersion")
-targetCompatibility = properties("javaVersion")
 
 repositories {
     mavenCentral()
@@ -38,74 +37,81 @@ intellij {
     buildSearchableOptions.enabled = false
 }
 
-patchPluginXml {
-    version.set(properties("pluginVersion"))
-
-    // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-    pluginDescription.set(
-            ExtensionsKt.markdownToHTML(
-                    project.file("README.md").text.lines()
-                            .dropWhile({ sx -> !sx.equals("<!-- Plugin description -->") })
-                            .skip(1)
-                            .takeWhile({ sx -> !sx.equals("<!-- Plugin description end -->") })
-                            .collect(Collectors.joining('\n'))
-            )
-    )
-
-
-    def changeLogForVersion = changelog.getOrNull(properties("pluginVersion"))
-    changeNotes.set((changeLogForVersion != null ? changeLogForVersion : changelog.getLatest()).toHTML())
-}
-
 changelog {
     version = properties("pluginVersion")
     header = "[${-> version.get()}] - ${new Date().format('yyyy-MM-dd')}"
 }
 
-import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
+tasks {
+    sourceCompatibility = properties("javaVersion")
+    targetCompatibility = properties("javaVersion")
 
-runPluginVerifier {
-    ideVersions = Arrays.asList(properties("pluginVerifierIdeVersions").split(','))
-    failureLevel = [FailureLevel.NOT_DYNAMIC]
-}
-
-// Set the respective compiler arguments to fail the build if there are warnings.
-tasks.withType(JavaCompile) {
-    options.compilerArgs.addAll(['-Xlint:all',
-                                 '-Xlint:-options',
-                                 '-Xlint:-rawtypes',
-                                 '-Xlint:-processing',
-                                 '-Xlint:-path', // Ignore JBR SDK manifest element warnings
-                                 '-proc:none',
-                                 '-Werror',
-                                 '-Xlint:-classfile']) //ignore warnings from dependencies
-}
-
-// NOTE: This plugin is not published to the marketplace!!! You won't be able to publish it!!
-if (System.getenv('IS_CI') != "True") {
-    // The below file (jetbrainsCredentials.gradle) should contain the below:
-    //    project.ext.set("intellijPublishUsername", "YOUR_USERNAME_HERE")
-    //    project.ext.set("intellijPublishPassword", "YOUR_PASSWORD_HERE")
-    //    project.ext.set("intellijPluginPublishToken", "YOUR_TOKEN_HERE")
-    //
-    // Because this contains the username and password, this file is also included in .gitignore file.
-    apply from: 'jetbrainsCredentials.gradle'
-
-    publishPlugin {
-        dependsOn("patchChangelog")
-//    username.set(intellijPublishUsername)
-//    password.set(intellijPublishPassword)
-        token.set(intellijPluginPublishToken)
+    wrapper {
+        gradleVersion = properties("gradleVersion")
     }
 
-    task checkJetBrainsCreds {
-        doLast {
-            println "Username: " + intellijPublishUsername
-            println "Password " + (project.hasProperty('intellijPublishPassword') ? "IS" : "is NOT") + " set."
+    patchPluginXml {
+        version.set(properties("pluginVersion"))
+
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+        pluginDescription.set(
+                ExtensionsKt.markdownToHTML(
+                        project.file("README.md").text.lines()
+                                .dropWhile({ String sx -> !sx.equals("<!-- Plugin description -->") })
+                                .skip(1)
+                                .takeWhile({ String sx -> !sx.equals("<!-- Plugin description end -->") })
+                                .collect(Collectors.joining('\n'))
+                )
+        )
+
+        def changeLogForVersion = changelog.getOrNull(properties("pluginVersion"))
+        changeNotes.set((changeLogForVersion != null ? changeLogForVersion : changelog.getLatest()).toHTML())
+    }
+
+    runPluginVerifier {
+        ideVersions = Arrays.asList(properties("pluginVerifierIdeVersions").split(','))
+        failureLevel = [FailureLevel.NOT_DYNAMIC]
+    }
+
+    // Set the respective compiler arguments to fail the build if there are warnings.
+    tasks.withType(JavaCompile) {
+        options.compilerArgs.addAll([
+                '-Xlint:all',
+                '-Xlint:-options',
+                '-Xlint:-rawtypes',
+                '-Xlint:-processing',
+                '-Xlint:-path', // Ignore JBR SDK manifest element warnings
+                '-proc:none',
+                '-Werror',
+                '-Xlint:-classfile'
+        ]) //ignore warnings from dependencies
+    }
+
+    // NOTE: This plugin is not published to the marketplace!!! You won't be able to publish it!!
+    if (System.getenv('IS_CI') != "True") {
+        // The below file (jetbrainsCredentials.gradle) should contain the below:
+        //    project.ext.set("intellijPublishUsername", "YOUR_USERNAME_HERE")
+        //    project.ext.set("intellijPublishPassword", "YOUR_PASSWORD_HERE")
+        //    project.ext.set("intellijPluginPublishToken", "YOUR_TOKEN_HERE")
+        //
+        // Because this contains the username and password, this file is also included in .gitignore file.
+        apply from: 'jetbrainsCredentials.gradle'
+
+        publishPlugin {
+            dependsOn("patchChangelog")
+            //username.set(intellijPublishUsername)
+            //password.set(intellijPublishPassword)
+            token.set(intellijPluginPublishToken)
+        }
+
+        task checkJetBrainsCreds {
+            doLast {
+                println "Username: " + intellijPublishUsername
+                println "Password " + (project.hasProperty('intellijPublishPassword') ? "IS" : "is NOT") + " set."
+            }
         }
     }
 }
-
 
 test {
     useTestNG()

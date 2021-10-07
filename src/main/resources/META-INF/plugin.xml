@@ -2,12 +2,7 @@
     <id>com.chriscarini.jetbrains.sample-intellij-plugin</id>
     <name>Sample IntelliJ Plugin</name>
     <vendor url="https://jetbrains.chriscarini.com">Chris Carini</vendor>
-
-    <description><![CDATA[
-    This is a sample plugin for the JetBrains IntelliJ IDEA IDE.<br>
-    It was created to be used as a sample for others, and help me test new things in the ecosystem.
-    ]]></description>
-
+    
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>

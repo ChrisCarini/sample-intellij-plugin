@@ -7,6 +7,7 @@
 ### Added
 
 - Restructured `build.gradle` file to extract all variables into `gradle.properties` file.
+- Adding ability to publish to different channels based on SemVer pre-release labels.
 
 ### Changed
 

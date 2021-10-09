@@ -2,6 +2,7 @@
 *.ipr
 *.iws
 .gradle/
+.qodana/
 build/
 gradle/
 out/

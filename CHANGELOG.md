@@ -11,6 +11,7 @@
 - Adding [JetBrains Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html)
 - Update Dependabot to include Gradle dependencies.
 - Adding GitHub build & release workflows.
+- Adding JetBrains Qodana (experimental, testing only)
 
 ### Changed
 

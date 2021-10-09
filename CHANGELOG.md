@@ -9,6 +9,7 @@
 - Restructured `build.gradle` file to extract all variables into `gradle.properties` file.
 - Adding ability to publish to different channels based on SemVer pre-release labels.
 - Adding [JetBrains Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html)
+- Update Dependabot to include Gradle dependencies.
 
 ### Changed
 

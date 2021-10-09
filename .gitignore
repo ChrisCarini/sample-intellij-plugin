@@ -7,4 +7,6 @@ gradle/
 out/
 gradlew*
 jetbrainsCredentials.gradle
+private.pem
+chain.crt
 *.DS_Store

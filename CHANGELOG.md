@@ -10,6 +10,7 @@
 - Adding ability to publish to different channels based on SemVer pre-release labels.
 - Adding [JetBrains Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html)
 - Update Dependabot to include Gradle dependencies.
+- Adding GitHub build & release workflows.
 
 ### Changed
 

@@ -66,6 +66,13 @@ jobs:
           echo "::set-output name=ideVersions::$IDE_VERSIONS"
           echo "::set-output name=pluginVerifierHomeDir::~/.pluginVerifier"
 
+      # TODO(ChrisCarini) - REMOVE; TESTING; PRINT ENV.
+      - name: Print Env
+        id: print_env
+        shell: bash
+        run: |
+          env
+
       # Cache Plugin Verifier IDEs
       - name: Setup Plugin Verifier IDEs Cache
         uses: actions/cache@v2.1.6

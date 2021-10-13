@@ -97,7 +97,7 @@ tasks {
     }
 
     // NOTE: This plugin is not published to the marketplace!!! You won't be able to publish it!!
-    if (System.getenv('IS_CI') != "True") {
+    if (System.getenv('CI') != "true") {
         // The below file (jetbrainsCredentials.gradle) should contain the below:
         //     project.ext.set("intellijSignPluginCertificateChain", new File('./chain.crt').getText('UTF-8'))
         //     project.ext.set("intellijSignPluginPrivateKey", new File('./private.pem').getText('UTF-8'))
@@ -108,10 +108,10 @@ tasks {
         apply from: 'jetbrainsCredentials.gradle'
     }
 
-    def signPluginCertificateChain = System.getenv('IS_CI') != "True" ? intellijSignPluginCertificateChain : System.getenv("CERTIFICATE_CHAIN")
-    def signPluginPrivateKey = System.getenv('IS_CI') != "True" ? intellijSignPluginPrivateKey : System.getenv("PRIVATE_KEY")
-    def signPluginPassword = System.getenv('IS_CI') != "True" ? intellijSignPluginPassword : System.getenv("PRIVATE_KEY_PASSWORD")
-    def publishPluginToken = System.getenv('IS_CI') != "True" ? intellijPluginPublishToken : System.getenv("PUBLISH_TOKEN")
+    def signPluginCertificateChain = System.getenv('CI') != "true" ? intellijSignPluginCertificateChain : System.getenv("CERTIFICATE_CHAIN")
+    def signPluginPrivateKey = System.getenv('CI') != "true" ? intellijSignPluginPrivateKey : System.getenv("PRIVATE_KEY")
+    def signPluginPassword = System.getenv('CI') != "true" ? intellijSignPluginPassword : System.getenv("PRIVATE_KEY_PASSWORD")
+    def publishPluginToken = System.getenv('CI') != "true" ? intellijPluginPublishToken : System.getenv("PUBLISH_TOKEN")
 
     signPlugin {
         dependsOn('checkJetBrainsSecrets')

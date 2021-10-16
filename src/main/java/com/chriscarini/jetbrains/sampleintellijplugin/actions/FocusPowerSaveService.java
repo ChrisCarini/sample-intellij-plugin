@@ -19,8 +19,8 @@ public class FocusPowerSaveService implements Disposable {
   @NonNls
   private static final Logger LOG = Logger.getInstance(FocusPowerSaveService.class);
 
-  private static ScheduledFuture frameActivatedJob;
-  private static ScheduledFuture frameDeactivatedJob;
+  private static ScheduledFuture<?> frameActivatedJob;
+  private static ScheduledFuture<?> frameDeactivatedJob;
 
   public FocusPowerSaveService() {
     Disposer.register(ApplicationManager.getApplication(), this);
@@ -67,9 +67,7 @@ public class FocusPowerSaveService implements Disposable {
 
         if (PowerSaveMode.isEnabled()) {
           LOG.debug("Frame Activated, Power Save Mode disabled; enable!");
-          ApplicationManager.getApplication().invokeLater(() -> {
-            PowerSaveMode.setEnabled(false);
-          }, ModalityState.any());
+          ApplicationManager.getApplication().invokeLater(() -> PowerSaveMode.setEnabled(false), ModalityState.any());
         }
       }, 12, TimeUnit.SECONDS);
     }
@@ -91,9 +89,7 @@ public class FocusPowerSaveService implements Disposable {
 
         if (!PowerSaveMode.isEnabled()) {
           LOG.debug("Frame Deactivated, Power Save Mode enabledGlobally; disable!");
-          ApplicationManager.getApplication().invokeLater(() -> {
-            PowerSaveMode.setEnabled(true);
-          }, ModalityState.any());
+          ApplicationManager.getApplication().invokeLater(() -> PowerSaveMode.setEnabled(true), ModalityState.any());
         }
       }, 12, TimeUnit.SECONDS);
     }

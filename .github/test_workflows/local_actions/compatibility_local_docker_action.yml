@@ -28,6 +28,8 @@ jobs:
       - name: Verify Plugin on IntelliJ Platforms
         id: verify
         uses: ./.github/actions/intellij-platform-plugin-verifier-action
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           ide-versions: .github/actions/intellij-platform-plugin-verifier-action/sample_ide_versions_file.txt
           failure-levels: |

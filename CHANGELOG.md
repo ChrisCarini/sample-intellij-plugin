@@ -7,6 +7,7 @@
 ### Added
 
 ### Changed
+- Upgrading IntelliJ to 2021.3
 
 ### Deprecated
 

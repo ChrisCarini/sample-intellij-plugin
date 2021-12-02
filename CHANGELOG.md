@@ -6,6 +6,20 @@
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.2.5] - 2021-10-06
+
+### Added
+
 - Restructured `build.gradle` file to extract all variables into `gradle.properties` file.
 - Adding ability to publish to different channels based on SemVer pre-release labels.
 - Adding [JetBrains Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html)
@@ -18,22 +32,6 @@
 - Upgrading Gradle to 6.6
 - Upgrading IntelliJ to 2021.2.2
 - Upgrading IntelliJ Gradle plugin to 1.2.0
-
-### Deprecated
-
-- N/A
-
-### Removed
-
-- N/A
-
-### Fixed
-
-- N/A
-
-### Security
-
-- N/A
 
 ## [0.2.4] - 2021-04-10
 

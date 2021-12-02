@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>com.chriscarini.jetbrains.sample-intellij-plugin</id>
-    <name>Sample IntelliJ Plugin</name>
-    <vendor url="https://jetbrains.chriscarini.com">Chris Carini</vendor>
-    
+    <name>Sample Menu Action</name>
+    <vendor email="jetbrains@chriscarini.com" url="https://jetbrains.chriscarini.com">Chris Carini</vendor>
+
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>

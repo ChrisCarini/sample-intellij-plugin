@@ -1,17 +1,25 @@
-name: IJ Plugin Compatibility (remote Docker action)
+name: IntelliJ Plugin Compatibility (remote Docker action)
 
 on:
+  # Trigger the workflow on pushes to only the 'master' branch (this avoids duplicate checks being run e.g. for dependabot pull requests)
   push:
+    branches: [ master ]
+
+  # Trigger the workflow on any pull request
+  pull_request:
+
+  # Trigger the workflow on a schedule; daily
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   compatibility:
-    name: 2021.1 & the latest EAP snapshot for both IDEA Community, IDEA Ultimate.
+    name: Ensure plugin compatibility against targeted platform version & the latest EAP snapshot for both IDEA Community, IDEA Ultimate.
 
     runs-on: ubuntu-latest
 
     steps:
-      # To use this repository's private action, you must check out the repository
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v2.4.0
 
       - name: Setup Java 11
@@ -20,14 +28,12 @@ jobs:
           java-version: 11
           distribution: 'zulu'
 
-      - name: Build the plugin using Gradle
+      - name: Build the plugin
         run: ./gradlew buildPlugin
-        env:
-          IS_CI: "True"
 
-      - name: Verify Plugin on IntelliJ Platforms
+      - name: Verify plugin on IntelliJ Platforms
         id: verify
-        uses: ChrisCarini/intellij-platform-plugin-verifier-action@v1.2.1
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
         with:
           ide-versions: |
             ideaIC:2021.1

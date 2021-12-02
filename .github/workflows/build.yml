@@ -14,9 +14,10 @@
 
 name: Build
 on:
-  # Trigger the workflow on pushes to only the 'main' branch (this avoids duplicate checks being run e.g. for dependabot pull requests)
+  # Trigger the workflow on pushes to only the 'master' branch (this avoids duplicate checks being run e.g. for dependabot pull requests)
   push:
     branches: [ master ]
+
   # Trigger the workflow on any pull request
   pull_request:
 
@@ -73,11 +74,11 @@ jobs:
           path: ${{ steps.properties.outputs.pluginVerifierHomeDir }}/ides
           key: ${{ runner.os }}-plugin-verifier-${{ steps.properties.outputs.ideVersions }}
 
-#      ## TODO (ChrisCarini) - Disabling this in the GH action; when running we see the below error message:
-#      ##   STDERR: Could not read script '/data/project/jetbrainsCredentials.gradle' as it does not exist
-#      # Run Qodana inspections
-#      - name: Qodana - Code Inspection
-#        uses: JetBrains/qodana-action@v2.1-eap
+      #      ## TODO (ChrisCarini) - Disabling this in the GH action; when running we see the below error message:
+      #      ##   STDERR: Could not read script '/data/project/jetbrainsCredentials.gradle' as it does not exist
+      #      # Run Qodana inspections
+      #      - name: Qodana - Code Inspection
+      #        uses: JetBrains/qodana-action@v2.1-eap
 
       # Run tests
       - name: Run Tests

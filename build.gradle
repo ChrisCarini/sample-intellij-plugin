@@ -160,5 +160,5 @@ test {
 
 dependencies {
     testCompile 'org.testng:testng:7.5'
-    testCompile "org.mockito:mockito-core:4.3.1"
+    testCompile "org.mockito:mockito-core:4.4.0"
 }

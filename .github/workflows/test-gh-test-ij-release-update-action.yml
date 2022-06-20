@@ -22,6 +22,7 @@ jobs:
 
       - name: 'wait around 1 minute (for debugging)'
         run: |
+          git reset --hard master
           date ; sleep 60 ; date
 
       - uses: ./.github/actions/gh-test-ij-release-update-action

@@ -19,6 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: 'wait around 1 minute (for debugging)'
+        run: |
+          date ; sleep 60 ; date
+
       - uses: ./.github/actions/gh-test-ij-release-update-action
         with:
           milliseconds: 1000
+
+      - name: 'wait around 3 minutes (for debugging)'
+        run: |
+          date ; sleep 180 ; date

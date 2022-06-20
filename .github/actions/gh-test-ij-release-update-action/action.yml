@@ -2,7 +2,7 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  milliseconds: # change this
+  PAT_TOKEN_FOR_IJ_UPDATE_ACTION: # change this
     required: true
     description: 'input description here'
     default: 'default value if applicable'

@@ -11,3 +11,4 @@ jetbrainsCredentials.gradle
 private.pem
 chain.crt
 *.DS_Store
+.idea/

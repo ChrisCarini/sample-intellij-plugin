@@ -2,8 +2,16 @@ import * as core from '@actions/core'
 import * as semver from 'semver'
 import * as glob from '@actions/glob'
 import * as properties from 'properties'
-import {readFileSync} from 'fs'
 import * as fs from 'fs'
+import {readFileSync} from 'fs'
+import simpleGit from 'simple-git'
+
+function git_add(file: string): void {
+  simpleGit()
+    .exec(() => core.debug(`Starting 'git add ${file}'...`))
+    .add(file)
+    .exec(() => core.debug(`Finished 'git add ${file}'...`))
+}
 
 function parseSemver(input: string | undefined): semver.SemVer {
   if (input === undefined) {
@@ -123,8 +131,8 @@ export async function updateGradleProperties(
       if (err) {
         return core.setFailed(`Error reading ${gradle_file}: ${err}`)
       }
-      core.debug('File contents:')
-      core.debug(data)
+      // core.debug('File contents:')
+      // core.debug(data)
 
       const result = data
         .replace(
@@ -143,12 +151,18 @@ export async function updateGradleProperties(
           `platformVersion = ${new_version}`
         )
 
-      core.debug('Updated file contents:')
-      core.debug(result)
+      // core.debug('Updated file contents:')
+      // core.debug(result)
 
-      fs.writeFile(gradle_file, result, 'utf8', function (err) {
-        if (err) return core.setFailed(`Error writing ${gradle_file}: ${err}`)
-      })
+      fs.promises
+        .writeFile(gradle_file, result, 'utf8')
+        .then(value => {
+          // `git add gradle.properties`
+          git_add(gradle_file)
+        })
+        .catch(reason => {
+          return core.setFailed(`Error writing ${gradle_file}: ${reason}`)
+        })
     })
 
     core.debug('Completed [gradle.properties] file.')
@@ -185,8 +199,8 @@ export async function updateChangelog(
       if (err) {
         return core.setFailed(`Error reading ${changelog_file}: ${err}`)
       }
-      core.debug('File contents:')
-      core.debug(data)
+      // core.debug('File contents:')
+      // core.debug(data)
 
       if (new RegExp(`^${upgrade_line}$`, 'gm').test(data)) {
         core.info(
@@ -202,13 +216,18 @@ export async function updateChangelog(
         `### Changed\n${upgrade_line}`
       )
 
-      core.debug('Updated file contents:')
-      core.debug(result)
+      // core.debug('Updated file contents:')
+      // core.debug(result)
 
-      fs.writeFile(changelog_file, result, 'utf8', function (err) {
-        if (err)
-          return core.setFailed(`Error writing ${changelog_file}: ${err}`)
-      })
+      fs.promises
+        .writeFile(changelog_file, result, 'utf8')
+        .then(value => {
+          // `git add CHANGELOG.md`
+          git_add(changelog_file)
+        })
+        .catch(reason => {
+          return core.setFailed(`Error writing ${changelog_file}: ${reason}`)
+        })
     })
 
     core.debug('Completed [CHANGELOG.md] file.')
@@ -222,8 +241,8 @@ export async function updateChangelog(
 function _fileContains(file: string, search: string): boolean {
   const fileData = fs.readFileSync(file, 'utf8')
 
-  core.debug(`[${file}] File contents:`)
-  core.debug(fileData)
+  // core.debug(`[${file}] File contents:`)
+  // core.debug(fileData)
 
   return new RegExp(`${search}`, 'gm').test(fileData)
 }
@@ -257,8 +276,8 @@ export async function updateGithubWorkflow(
         if (err) {
           return core.setFailed(`Error reading ${file}: ${err}`)
         }
-        core.debug('File contents:')
-        core.debug(data)
+        // core.debug('File contents:')
+        // core.debug(data)
 
         const result = data
           .replace(
@@ -270,12 +289,18 @@ export async function updateGithubWorkflow(
             `ideaIU:${new_version}`
           )
 
-        core.debug('Updated file contents:')
-        core.debug(result)
+        // core.debug('Updated file contents:')
+        // core.debug(result)
 
-        fs.writeFile(file, result, 'utf8', function (err) {
-          if (err) return core.setFailed(`Error writing ${file}: ${err}`)
-        })
+        fs.promises
+          .writeFile(file, result, 'utf8')
+          .then(value => {
+            // `git add <current_workflow_file>`
+            git_add(file)
+          })
+          .catch(reason => {
+            return core.setFailed(`Error writing ${file}: ${reason}`)
+          })
       })
       core.debug(`Completed [${file}] file.`)
     })

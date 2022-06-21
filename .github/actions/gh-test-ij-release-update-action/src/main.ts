@@ -7,6 +7,26 @@ import {
 import {getLatestIntellijRelease} from './jetbrains/versions'
 import * as semver from 'semver'
 import {wait} from './wait'
+import simpleGit, {StatusResult} from 'simple-git'
+
+async function checkFileChangeCount(): Promise<number> {
+  const statusResult: StatusResult = await simpleGit().status()
+
+  core.debug(`Files created:  ${statusResult.created.length}`)
+  core.debug(`Files modified: ${statusResult.modified.length}`)
+  core.debug(`Files deleted:  ${statusResult.deleted.length}`)
+
+  statusResult.created.forEach(value => {
+    core.debug(`C --> ${value}`)
+  })
+  statusResult.modified.forEach(value => {
+    core.debug(`M --> ${value}`)
+  })
+  statusResult.deleted.forEach(value => {
+    core.debug(`D --> ${value}`)
+  })
+  return statusResult.modified.length
+}
 
 async function run(): Promise<void> {
   try {
@@ -34,10 +54,20 @@ async function run(): Promise<void> {
     // update github workflows
     await updateGithubWorkflow(currentPlatformVersion, latestVersion)
 
+    // check if there are files that are changed
+    const filesChanged: number = await checkFileChangeCount()
 
+    // If there are *NO* files that have changed, exit; we are done.
+    if (filesChanged == 0) {
+      core.info('No files have changed, must be on latest version!')
+      return
+    }
 
-    // // TODO(ChrisCarini) - REMOVE; FOR TESTING TO SEE IF FILES CHANGED IN DOCKER
-    // await wait(3 * 60 * 1000)
+    // // Commit the outstanding files
+    // git.commit(`Upgrading IntelliJ to ${latestVersion}`)
+
+    // wait a few seconds to wrap things up, I was seeing the above call not print anything
+    await wait(10)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

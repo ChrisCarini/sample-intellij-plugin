@@ -36,6 +36,14 @@ jobs:
         with:
           milliseconds: 1000
 
-      - name: 'wait around 3 minutes (for debugging)'
+      - name: 'git status'
         run: |
-          date ; sleep 180 ; date
+          git status
+
+      - name: 'git diff | cat'
+        run: |
+          git diff | cat
+
+#      - name: 'wait around 3 minutes (for debugging)'
+#        run: |
+#          date ; sleep 180 ; date

@@ -25,6 +25,10 @@ jobs:
           git reset --hard master
           date ; sleep 60 ; date
 
+      - name: 'undo any gradle file changes before the action'
+        run: |
+          git restore gradlew* gradle/
+
       - uses: ./.github/actions/gh-test-ij-release-update-action
         with:
           milliseconds: 1000

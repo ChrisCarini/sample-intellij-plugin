@@ -20,10 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: 'wait around 1 minute (for debugging)'
-        run: |
-          git reset --hard master
-          date ; sleep 60 ; date
+#      - name: 'reset to master'
+#        run: |
+#          git reset --hard master
+
+#      - name: 'wait around 1 minute (for debugging)'
+#        run: |
+#          date ; sleep 60 ; date
 
       - name: 'undo any gradle file changes before the action'
         run: |

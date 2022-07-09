@@ -13,7 +13,9 @@ import {wait} from './wait'
 import simpleGit, {StatusResult} from 'simple-git'
 
 async function checkFileChangeCount(): Promise<number> {
+  core.debug('BEFORE: simpleGit().status()')
   const statusResult: StatusResult = await simpleGit().status()
+  core.debug('AFTER: simpleGit().status()')
 
   core.debug(`Files created:  ${statusResult.created.length}`)
   core.debug(`Files modified: ${statusResult.modified.length}`)
@@ -57,8 +59,10 @@ async function run(): Promise<void> {
     // update github workflows
     await updateGithubWorkflow(currentPlatformVersion, latestVersion)
 
+    core.debug('BEFORE: check file change count')
     // check if there are files that are changed
     const filesChanged: number = await checkFileChangeCount()
+    core.debug('AFTER: check file change count')
 
     // If there are *NO* files that have changed, exit; we are done.
     if (filesChanged == 0) {

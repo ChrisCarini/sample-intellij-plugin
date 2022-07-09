@@ -404,7 +404,9 @@ const versions_1 = __nccwpck_require__(5366);
 const simple_git_1 = __importDefault(__nccwpck_require__(9103));
 function checkFileChangeCount() {
     return __awaiter(this, void 0, void 0, function* () {
+        core.debug('BEFORE: simpleGit().status()');
         const statusResult = yield (0, simple_git_1.default)().status();
+        core.debug('AFTER: simpleGit().status()');
         core.debug(`Files created:  ${statusResult.created.length}`);
         core.debug(`Files modified: ${statusResult.modified.length}`);
         core.debug(`Files deleted:  ${statusResult.deleted.length}`);
@@ -442,8 +444,10 @@ function run() {
             yield (0, files_1.updateChangelog)(latestVersion);
             // update github workflows
             yield (0, files_1.updateGithubWorkflow)(currentPlatformVersion, latestVersion);
+            core.debug('BEFORE: check file change count');
             // check if there are files that are changed
             const filesChanged = yield checkFileChangeCount();
+            core.debug('AFTER: check file change count');
             // If there are *NO* files that have changed, exit; we are done.
             if (filesChanged == 0) {
                 core.info('No files have changed, must be on latest version!');

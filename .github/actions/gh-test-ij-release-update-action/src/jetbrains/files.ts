@@ -127,43 +127,37 @@ export async function updateGradleProperties(
     core.debug('')
     core.debug(`next_plugin_version:                  ${next_plugin_version}`)
 
-    fs.readFile(gradle_file, 'utf8', (err, data) => {
-      if (err) {
-        return core.setFailed(`Error reading ${gradle_file}: ${err}`)
-      }
-      // core.debug('File contents:')
-      // core.debug(data)
+    const data = fs.readFileSync(gradle_file, 'utf8')
 
-      const result = data
-        .replace(
-          new RegExp(`^pluginVersion = ${current_plugin_version}$`, 'gm'),
-          `pluginVersion = ${next_plugin_version}`
-        )
-        .replace(
-          new RegExp(
-            `^pluginVerifierIdeVersions = ${current_plugin_verifier_ide_versions}$`,
-            'gm'
-          ),
-          `pluginVerifierIdeVersions = ${new_version}`
-        )
-        .replace(
-          new RegExp(`^platformVersion = ${current_platform_version}$`, 'gm'),
-          `platformVersion = ${new_version}`
-        )
+    core.debug('File contents:')
+    core.debug(data)
 
-      // core.debug('Updated file contents:')
-      // core.debug(result)
+    const result = data
+      .replace(
+        new RegExp(`^pluginVersion = ${current_plugin_version}$`, 'gm'),
+        `pluginVersion = ${next_plugin_version}`
+      )
+      .replace(
+        new RegExp(
+          `^pluginVerifierIdeVersions = ${current_plugin_verifier_ide_versions}$`,
+          'gm'
+        ),
+        `pluginVerifierIdeVersions = ${new_version}`
+      )
+      .replace(
+        new RegExp(`^platformVersion = ${current_platform_version}$`, 'gm'),
+        `platformVersion = ${new_version}`
+      )
 
-      fs.promises
-        .writeFile(gradle_file, result, 'utf8')
-        .then(async value => {
-          // `git add gradle.properties`
-          await git_add(gradle_file)
-        })
-        .catch(reason => {
-          return core.setFailed(`Error writing ${gradle_file}: ${reason}`)
-        })
-    })
+    core.debug('Updated file contents:')
+    core.debug(result)
+
+    await fs.promises.writeFile(gradle_file, result, 'utf8')
+
+    core.debug(`${gradle_file} file written; about to git add...`)
+
+    // `git add gradle.properties`
+    await git_add(gradle_file)
 
     core.debug('Completed [gradle.properties] file.')
 
@@ -195,40 +189,31 @@ export async function updateChangelog(
     }
     const changelog_file = files[0]
 
-    fs.readFile(changelog_file, 'utf8', (err, data) => {
-      if (err) {
-        return core.setFailed(`Error reading ${changelog_file}: ${err}`)
-      }
-      // core.debug('File contents:')
-      // core.debug(data)
+    const data = fs.readFileSync(changelog_file, 'utf8')
 
-      if (new RegExp(`^${upgrade_line}$`, 'gm').test(data)) {
-        core.info(
-          `Skipping  [CHANGELOG.md] file, already found "${upgrade_line}" in file.`
-        )
-        return
-      }
-
-      const result = data.replace(
-        // We do *NOT* want the `g` flag, as we only want to replace the first instance
-        // (which should be in the `Unreleased` section) of this section.
-        new RegExp(`^### Changed$`, 'm'),
-        `### Changed\n${upgrade_line}`
+    if (new RegExp(`^${upgrade_line}$`, 'gm').test(data)) {
+      core.info(
+        `Skipping  [CHANGELOG.md] file, already found "${upgrade_line}" in file.`
       )
+      return
+    }
 
-      // core.debug('Updated file contents:')
-      // core.debug(result)
+    const result = data.replace(
+      // We do *NOT* want the `g` flag, as we only want to replace the first instance
+      // (which should be in the `Unreleased` section) of this section.
+      new RegExp(`^### Changed$`, 'm'),
+      `### Changed\n${upgrade_line}`
+    )
 
-      fs.promises
-        .writeFile(changelog_file, result, 'utf8')
-        .then(async value => {
-          // `git add CHANGELOG.md`
-          await git_add(changelog_file)
-        })
-        .catch(reason => {
-          return core.setFailed(`Error writing ${changelog_file}: ${reason}`)
-        })
-    })
+    core.debug('Updated file contents:')
+    core.debug(result)
+
+    await fs.promises.writeFile(changelog_file, result, 'utf8')
+
+    core.debug(`${changelog_file} file written; about to git add...`)
+
+    // `git add CHANGELOG.md`
+    await git_add(changelog_file)
 
     core.debug('Completed [CHANGELOG.md] file.')
   } catch (error) {

@@ -130,28 +130,19 @@ function updateGradleProperties(new_version) {
             const next_plugin_version = _next_plugin_version(current_plugin_version, current_platform_version, new_version);
             core.debug('');
             core.debug(`next_plugin_version:                  ${next_plugin_version}`);
-            fs.readFile(gradle_file, 'utf8', (err, data) => {
-                if (err) {
-                    return core.setFailed(`Error reading ${gradle_file}: ${err}`);
-                }
-                // core.debug('File contents:')
-                // core.debug(data)
-                const result = data
-                    .replace(new RegExp(`^pluginVersion = ${current_plugin_version}$`, 'gm'), `pluginVersion = ${next_plugin_version}`)
-                    .replace(new RegExp(`^pluginVerifierIdeVersions = ${current_plugin_verifier_ide_versions}$`, 'gm'), `pluginVerifierIdeVersions = ${new_version}`)
-                    .replace(new RegExp(`^platformVersion = ${current_platform_version}$`, 'gm'), `platformVersion = ${new_version}`);
-                // core.debug('Updated file contents:')
-                // core.debug(result)
-                fs.promises
-                    .writeFile(gradle_file, result, 'utf8')
-                    .then((value) => __awaiter(this, void 0, void 0, function* () {
-                    // `git add gradle.properties`
-                    yield git_add(gradle_file);
-                }))
-                    .catch(reason => {
-                    return core.setFailed(`Error writing ${gradle_file}: ${reason}`);
-                });
-            });
+            const data = fs.readFileSync(gradle_file, 'utf8');
+            core.debug('File contents:');
+            core.debug(data);
+            const result = data
+                .replace(new RegExp(`^pluginVersion = ${current_plugin_version}$`, 'gm'), `pluginVersion = ${next_plugin_version}`)
+                .replace(new RegExp(`^pluginVerifierIdeVersions = ${current_plugin_verifier_ide_versions}$`, 'gm'), `pluginVerifierIdeVersions = ${new_version}`)
+                .replace(new RegExp(`^platformVersion = ${current_platform_version}$`, 'gm'), `platformVersion = ${new_version}`);
+            core.debug('Updated file contents:');
+            core.debug(result);
+            yield fs.promises.writeFile(gradle_file, result, 'utf8');
+            core.debug(`${gradle_file} file written; about to git add...`);
+            // `git add gradle.properties`
+            yield git_add(gradle_file);
             core.debug('Completed [gradle.properties] file.');
             return current_platform_version
                 ? current_platform_version
@@ -179,32 +170,21 @@ function updateChangelog(new_version) {
                 core.setFailed('Too many .properties files found. Exiting.');
             }
             const changelog_file = files[0];
-            fs.readFile(changelog_file, 'utf8', (err, data) => {
-                if (err) {
-                    return core.setFailed(`Error reading ${changelog_file}: ${err}`);
-                }
-                // core.debug('File contents:')
-                // core.debug(data)
-                if (new RegExp(`^${upgrade_line}$`, 'gm').test(data)) {
-                    core.info(`Skipping  [CHANGELOG.md] file, already found "${upgrade_line}" in file.`);
-                    return;
-                }
-                const result = data.replace(
-                // We do *NOT* want the `g` flag, as we only want to replace the first instance
-                // (which should be in the `Unreleased` section) of this section.
-                new RegExp(`^### Changed$`, 'm'), `### Changed\n${upgrade_line}`);
-                // core.debug('Updated file contents:')
-                // core.debug(result)
-                fs.promises
-                    .writeFile(changelog_file, result, 'utf8')
-                    .then((value) => __awaiter(this, void 0, void 0, function* () {
-                    // `git add CHANGELOG.md`
-                    yield git_add(changelog_file);
-                }))
-                    .catch(reason => {
-                    return core.setFailed(`Error writing ${changelog_file}: ${reason}`);
-                });
-            });
+            const data = fs.readFileSync(changelog_file, 'utf8');
+            if (new RegExp(`^${upgrade_line}$`, 'gm').test(data)) {
+                core.info(`Skipping  [CHANGELOG.md] file, already found "${upgrade_line}" in file.`);
+                return;
+            }
+            const result = data.replace(
+            // We do *NOT* want the `g` flag, as we only want to replace the first instance
+            // (which should be in the `Unreleased` section) of this section.
+            new RegExp(`^### Changed$`, 'm'), `### Changed\n${upgrade_line}`);
+            core.debug('Updated file contents:');
+            core.debug(result);
+            yield fs.promises.writeFile(changelog_file, result, 'utf8');
+            core.debug(`${changelog_file} file written; about to git add...`);
+            // `git add CHANGELOG.md`
+            yield git_add(changelog_file);
             core.debug('Completed [CHANGELOG.md] file.');
         }
         catch (error) {

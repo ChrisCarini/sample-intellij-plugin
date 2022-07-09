@@ -1,49 +1,66 @@
-name: 'build-test'
+name: 'IJ Release Update'
 on: # rebuild any PRs and main branch changes
   pull_request:
+
   push:
     branches:
       - main
       - 'releases/*'
 
+  workflow_dispatch:
+
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: |
-          npm install
-      - run: |
-          npm run all
+#  build: # make sure build/ci work properly
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - run: |
+#          npm install
+#      - run: |
+#          npm run all
   test-gh-test-ij-release-update-action: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
 
-#      - name: 'reset to master'
-#        run: |
-#          git reset --hard master
+      #      - name: 'reset to master'
+      #        run: |
+      #          git reset --hard master
 
-#      - name: 'wait around 1 minute (for debugging)'
-#        run: |
-#          date ; sleep 60 ; date
+      #      - name: 'wait around 1 minute (for debugging)'
+      #        run: |
+      #          date ; sleep 60 ; date
 
       - name: 'undo any gradle file changes before the action'
         run: |
           git restore gradlew* gradle/
 
       - uses: ./.github/actions/gh-test-ij-release-update-action
-        with:
-          milliseconds: 1000
+#        with:
+#          milliseconds: 1000
+      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #        env:
+      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'git status'
-        run: |
-          git status
-
-      - name: 'git diff | cat'
-        run: |
-          git diff | cat
-
+      #      - name: 'git status'
+      #        run: |
+      #          git status
+      #
+      ##      - name: 'git diff | cat'
+      ##        run: |
+      ##          git diff | cat
+      #
+      #      - name: 'git show | cat'
+      #        run: |
+      #          git show | cat
+      #
+      #      - name: 'git branch'
+      #        run: |
+      #          git branch
+      #
 #      - name: 'wait around 3 minutes (for debugging)'
 #        run: |
 #          date ; sleep 180 ; date

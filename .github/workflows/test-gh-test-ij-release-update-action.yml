@@ -18,3 +18,5 @@ jobs:
           token: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}
 
       - uses: ./.github/actions/gh-test-ij-release-update-action
+        with:
+          PAT_TOKEN_FOR_IJ_UPDATE_ACTION: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}

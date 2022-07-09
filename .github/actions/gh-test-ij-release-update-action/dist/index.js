@@ -426,14 +426,6 @@ function run() {
             // Commit the outstanding files
             core.debug('ABOUT TO COMMIT');
             const newBranchName = `ChrisCarini/upgradeIntelliJ-${latestVersion}`;
-            // const githubToken = core.getInput('MY_GITHUB_TOKEN')
-            // core.setSecret(githubToken)
-            // const githubUrl = github.context.serverUrl.split('//', 1)[1].trim()
-            const [githubUrlProtocol, githubUrl] = github.context.serverUrl.split('//');
-            const { owner, repo } = github.context.repo;
-            // const remoteRepo = `"https://${githubToken}@github.com/${owner}/${repo}.git"`
-            // core.debug(`ORIGIN STR: ${remoteRepo}`)
-            // core.debug(`SHOULD BE RUNNING: [git push ${remoteRepo} ${newBranchName}]`)
             yield (0, simple_git_1.default)()
                 .exec(() => core.debug(`Starting [git checkout ${newBranchName}]...`))
                 .checkoutLocalBranch(newBranchName)
@@ -441,51 +433,16 @@ function run() {
                 .addConfig('http.sslVerify', 'false')
                 .addConfig('user.name', 'ChrisCarini')
                 .addConfig('user.email', '6374067+chriscarini@users.noreply.github.com')
-                // .addConfig(
-                //   'credential.https://github.com/.helper',
-                //   '! f() { echo username=x-access-token; echo password=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; };f'
-                // )
                 .exec(() => core.debug(`Starting [git commit -m "Upgrading IntelliJ to ${latestVersion}"]...`))
                 .commit(`Upgrading IntelliJ to ${latestVersion}`)
                 .exec(() => core.debug(`Finished [git commit -m "Upgrading IntelliJ to ${latestVersion}"]...`))
                 .exec(() => core.debug(`Before [git push -u origin ${newBranchName}"]..`))
                 .push(['-u', 'origin', newBranchName])
                 .exec(() => core.debug(`After [git push -u origin ${newBranchName}"]...`));
-            // , async (err, data) => {
-            //   core.debug(data.commit)
-            //
-            //   const octokit = github.getOctokit(githubToken)
-            //
-            //   await octokit.rest.git.createCommit({
-            //     owner: github.context.repo.owner,
-            //     repo: github.context.repo.repo,
-            //     message: `Upgrading IntelliJ to ${latestVersion}`,
-            //     tree: data.commit,
-            //     parents: ['master']
-            //   })
-            // })
-            // .push([remoteRepo, `${newBranchName}`], (err, data) => {
-            //   if (err) {
-            //     console.debug(err.message)
-            //     return
-            //   }
-            //
-            //   data?.remoteMessages.all.forEach(value => {
-            //     core.debug(value)
-            //   })
-            // })
-            // TODO(ChrisCarini) - WHAT THE ACTUAL F. This does *NOT* work from code;
-            //  but the printed command runs totally fine w/in the docker container. F.
-            //  Perhaps all my other attempts would work too - perhaps try pushing this
-            //  action and depending upon it like a normal action and using it outside of
-            //  the `act` CLI.........FFFFFFFFFFFFFAK
-            // core.debug(
-            //   `SHOULD BE RUNNING: [git push --set-upstream origin ${newBranchName}]`
-            // )
-            // await exec(`git push --set-upstream origin ${newBranchName}`)
-            core.debug('COMMITTED!!!');
-            // const octokit = github.getOctokit(githubToken)
-            //
+            core.debug('PUSHED!!!');
+            const githubToken = core.getInput('PAT_TOKEN_FOR_IJ_UPDATE_ACTION');
+            core.setSecret(githubToken);
+            const octokit = github.getOctokit(githubToken);
             // await octokit.rest.git.createCommit({
             //   owner: github.context.repo.owner,
             //   repo: github.context.repo.repo,
@@ -493,16 +450,14 @@ function run() {
             //   tree: newBranchName,
             //   parents: ['master']
             // })
-            //
-            // await octokit.rest.pulls.create({
-            //   owner: github.context.repo.owner,
-            //   repo: github.context.repo.repo,
-            //   title: `Upgrading IntelliJ to ${latestVersion}`,
-            //   body: `Please pull these awesome changes in! We are upgrading IntelliJ to ${latestVersion}`,
-            //   head: newBranchName,
-            //   base: 'master'
-            // })
-            //
+            yield octokit.rest.pulls.create({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                title: `Upgrading IntelliJ to ${latestVersion}`,
+                body: `Please pull these awesome changes in! We are upgrading IntelliJ to ${latestVersion}`,
+                head: newBranchName,
+                base: 'master'
+            });
             // // // wait a few seconds to wrap things up, I was seeing the above call not print anything
             // // await wait(10)
         }

@@ -375,9 +375,9 @@ const versions_1 = __nccwpck_require__(5366);
 const simple_git_1 = __importDefault(__nccwpck_require__(9103));
 function checkFileChangeCount() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.debug("BEFORE: simpleGit().status()");
+        core.debug('BEFORE: simpleGit().status()');
         const statusResult = yield (0, simple_git_1.default)().status();
-        core.debug("AFTER: simpleGit().status()");
+        core.debug('AFTER: simpleGit().status()');
         core.debug(`Files created:  ${statusResult.created.length}`);
         core.debug(`Files modified: ${statusResult.modified.length}`);
         core.debug(`Files deleted:  ${statusResult.deleted.length}`);
@@ -415,36 +415,40 @@ function run() {
             yield (0, files_1.updateChangelog)(latestVersion);
             // update github workflows
             yield (0, files_1.updateGithubWorkflow)(currentPlatformVersion, latestVersion);
-            core.debug("BEFORE: check file change count");
+            core.debug('BEFORE: check file change count');
             // check if there are files that are changed
             const filesChanged = yield checkFileChangeCount();
-            core.debug("AFTER: check file change count");
+            core.debug('AFTER: check file change count');
             // If there are *NO* files that have changed, exit; we are done.
             if (filesChanged == 0) {
-                core.info("No files have changed, must be on latest version!");
+                core.info('No files have changed, must be on latest version!');
                 return;
             }
             // Commit the outstanding files
-            core.debug("ABOUT TO COMMIT");
+            core.debug('ABOUT TO COMMIT');
             const newBranchName = `ChrisCarini/upgradeIntelliJ-${latestVersion}`;
             // const githubToken = core.getInput('MY_GITHUB_TOKEN')
             // core.setSecret(githubToken)
             // const githubUrl = github.context.serverUrl.split('//', 1)[1].trim()
-            const [githubUrlProtocol, githubUrl] = github.context.serverUrl.split("//");
+            const [githubUrlProtocol, githubUrl] = github.context.serverUrl.split('//');
             const { owner, repo } = github.context.repo;
             // const remoteRepo = `"https://${githubToken}@github.com/${owner}/${repo}.git"`
             // core.debug(`ORIGIN STR: ${remoteRepo}`)
             // core.debug(`SHOULD BE RUNNING: [git push ${remoteRepo} ${newBranchName}]`)
-            (0, simple_git_1.default)()
+            yield (0, simple_git_1.default)()
+                .exec(() => core.debug(`Starting [git checkout ${newBranchName}]...`))
                 .checkoutLocalBranch(newBranchName)
-                .addConfig("http.sslVerify", "false")
-                .addConfig("user.name", "ChrisCarini")
-                .addConfig("user.email", "6374067+chriscarini@users.noreply.github.com")
+                .exec(() => core.debug(`Starting [git config] configurations...`))
+                .addConfig('http.sslVerify', 'false')
+                .addConfig('user.name', 'ChrisCarini')
+                .addConfig('user.email', '6374067+chriscarini@users.noreply.github.com')
                 // .addConfig(
                 //   'credential.https://github.com/.helper',
                 //   '! f() { echo username=x-access-token; echo password=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; };f'
                 // )
-                .commit(`Upgrading IntelliJ to ${latestVersion}`);
+                .exec(() => core.debug(`Starting [git commit -m "Upgrading IntelliJ to ${latestVersion}"]...`))
+                .commit(`Upgrading IntelliJ to ${latestVersion}`)
+                .exec(() => core.debug(`Finished [git commit -m "Upgrading IntelliJ to ${latestVersion}"]...`));
             // , async (err, data) => {
             //   core.debug(data.commit)
             //
@@ -475,7 +479,7 @@ function run() {
             //  the `act` CLI.........FFFFFFFFFFFFFAK
             core.debug(`SHOULD BE RUNNING: [git push --set-upstream origin ${newBranchName}]`);
             yield (0, exec_1.exec)(`git push --set-upstream origin ${newBranchName}`);
-            core.debug("COMMITTED!!!");
+            core.debug('COMMITTED!!!');
             // const octokit = github.getOctokit(githubToken)
             //
             // await octokit.rest.git.createCommit({
@@ -505,9 +509,8 @@ function run() {
     });
 }
 run()
-    .then(() => {
-})
-    .catch((err) => {
+    .then(() => { })
+    .catch(err => {
     core.setFailed(err.message);
     core.debug(err);
 });

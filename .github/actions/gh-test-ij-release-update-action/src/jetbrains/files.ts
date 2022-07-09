@@ -6,7 +6,7 @@ import * as fs from 'fs'
 import {readFileSync} from 'fs'
 import simpleGit from 'simple-git'
 
-function git_add(file: string): void {
+async function git_add(file: string): Promise<void> {
   simpleGit()
     .exec(() => core.debug(`Starting 'git add ${file}'...`))
     .add(file)
@@ -156,9 +156,9 @@ export async function updateGradleProperties(
 
       fs.promises
         .writeFile(gradle_file, result, 'utf8')
-        .then(value => {
+        .then(async (value) => {
           // `git add gradle.properties`
-          git_add(gradle_file)
+          await git_add(gradle_file)
         })
         .catch(reason => {
           return core.setFailed(`Error writing ${gradle_file}: ${reason}`)
@@ -221,9 +221,9 @@ export async function updateChangelog(
 
       fs.promises
         .writeFile(changelog_file, result, 'utf8')
-        .then(value => {
+        .then(async (value) => {
           // `git add CHANGELOG.md`
-          git_add(changelog_file)
+          await git_add(changelog_file)
         })
         .catch(reason => {
           return core.setFailed(`Error writing ${changelog_file}: ${reason}`)
@@ -294,9 +294,9 @@ export async function updateGithubWorkflow(
 
         fs.promises
           .writeFile(file, result, 'utf8')
-          .then(value => {
+          .then(async (value) => {
             // `git add <current_workflow_file>`
-            git_add(file)
+            await git_add(file)
           })
           .catch(reason => {
             return core.setFailed(`Error writing ${file}: ${reason}`)

@@ -51,10 +51,12 @@ const fs = __importStar(__nccwpck_require__(7147));
 const fs_1 = __nccwpck_require__(7147);
 const simple_git_1 = __importDefault(__nccwpck_require__(9103));
 function git_add(file) {
-    (0, simple_git_1.default)()
-        .exec(() => core.debug(`Starting 'git add ${file}'...`))
-        .add(file)
-        .exec(() => core.debug(`Finished 'git add ${file}'...`));
+    return __awaiter(this, void 0, void 0, function* () {
+        (0, simple_git_1.default)()
+            .exec(() => core.debug(`Starting 'git add ${file}'...`))
+            .add(file)
+            .exec(() => core.debug(`Finished 'git add ${file}'...`));
+    });
 }
 function parseSemver(input) {
     if (input === undefined) {
@@ -142,10 +144,10 @@ function updateGradleProperties(new_version) {
                 // core.debug(result)
                 fs.promises
                     .writeFile(gradle_file, result, 'utf8')
-                    .then(value => {
+                    .then((value) => __awaiter(this, void 0, void 0, function* () {
                     // `git add gradle.properties`
-                    git_add(gradle_file);
-                })
+                    yield git_add(gradle_file);
+                }))
                     .catch(reason => {
                     return core.setFailed(`Error writing ${gradle_file}: ${reason}`);
                 });
@@ -195,10 +197,10 @@ function updateChangelog(new_version) {
                 // core.debug(result)
                 fs.promises
                     .writeFile(changelog_file, result, 'utf8')
-                    .then(value => {
+                    .then((value) => __awaiter(this, void 0, void 0, function* () {
                     // `git add CHANGELOG.md`
-                    git_add(changelog_file);
-                })
+                    yield git_add(changelog_file);
+                }))
                     .catch(reason => {
                     return core.setFailed(`Error writing ${changelog_file}: ${reason}`);
                 });
@@ -246,10 +248,10 @@ function updateGithubWorkflow(current_platform_version, new_version) {
                     // core.debug(result)
                     fs.promises
                         .writeFile(file, result, 'utf8')
-                        .then(value => {
+                        .then((value) => __awaiter(this, void 0, void 0, function* () {
                         // `git add <current_workflow_file>`
-                        git_add(file);
-                    })
+                        yield git_add(file);
+                    }))
                         .catch(reason => {
                         return core.setFailed(`Error writing ${file}: ${reason}`);
                     });

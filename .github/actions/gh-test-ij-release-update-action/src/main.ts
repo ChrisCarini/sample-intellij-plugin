@@ -105,6 +105,9 @@ async function run(): Promise<void> {
           `Finished [git commit -m "Upgrading IntelliJ to ${latestVersion}"]...`
         )
       )
+      .exec(() => core.debug(`Before [git push -u origin ${newBranchName}"]..`))
+      .push(['-u', 'origin', newBranchName])
+      .exec(() => core.debug(`After [git push -u origin ${newBranchName}"]...`))
     // , async (err, data) => {
     //   core.debug(data.commit)
     //
@@ -134,10 +137,10 @@ async function run(): Promise<void> {
     //  Perhaps all my other attempts would work too - perhaps try pushing this
     //  action and depending upon it like a normal action and using it outside of
     //  the `act` CLI.........FFFFFFFFFFFFFAK
-    core.debug(
-      `SHOULD BE RUNNING: [git push --set-upstream origin ${newBranchName}]`
-    )
-    await exec(`git push --set-upstream origin ${newBranchName}`)
+    // core.debug(
+    //   `SHOULD BE RUNNING: [git push --set-upstream origin ${newBranchName}]`
+    // )
+    // await exec(`git push --set-upstream origin ${newBranchName}`)
 
     core.debug('COMMITTED!!!')
 

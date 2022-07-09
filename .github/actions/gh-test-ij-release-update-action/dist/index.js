@@ -234,30 +234,19 @@ function updateGithubWorkflow(current_platform_version, new_version) {
                 return _fileContains(file, 'uses: ChrisCarini/intellij-platform-plugin-verifier-action');
             });
             core.debug(`Found ${filesToUpdate.length} files containing [ChrisCarini/intellij-platform-plugin-verifier-action]...`);
-            filesToUpdate.forEach(file => {
-                fs.readFile(file, 'utf8', (err, data) => {
-                    if (err) {
-                        return core.setFailed(`Error reading ${file}: ${err}`);
-                    }
-                    // core.debug('File contents:')
-                    // core.debug(data)
-                    const result = data
-                        .replace(new RegExp(`ideaIC:${current_platform_version}`, 'gm'), `ideaIC:${new_version}`)
-                        .replace(new RegExp(`ideaIU:${current_platform_version}`, 'gm'), `ideaIU:${new_version}`);
-                    // core.debug('Updated file contents:')
-                    // core.debug(result)
-                    fs.promises
-                        .writeFile(file, result, 'utf8')
-                        .then((value) => __awaiter(this, void 0, void 0, function* () {
-                        // `git add <current_workflow_file>`
-                        yield git_add(file);
-                    }))
-                        .catch(reason => {
-                        return core.setFailed(`Error writing ${file}: ${reason}`);
-                    });
-                });
+            for (const file of filesToUpdate) {
+                const data = fs.readFileSync(file, 'utf8');
+                const result = data
+                    .replace(new RegExp(`ideaIC:${current_platform_version}`, 'gm'), `ideaIC:${new_version}`)
+                    .replace(new RegExp(`ideaIU:${current_platform_version}`, 'gm'), `ideaIU:${new_version}`);
+                core.debug('Updated file contents:');
+                core.debug(result);
+                yield fs.promises.writeFile(file, result, 'utf8');
+                core.debug(`${file} file written; about to git add...`);
+                // `git add <current_workflow_file>`
+                yield git_add(file);
                 core.debug(`Completed [${file}] file.`);
-            });
+            }
             core.debug(`Completed updating ${filesToUpdate.length} GitHub workflow files.`);
         }
         catch (error) {

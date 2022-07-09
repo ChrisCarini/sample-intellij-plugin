@@ -156,7 +156,7 @@ export async function updateGradleProperties(
 
       fs.promises
         .writeFile(gradle_file, result, 'utf8')
-        .then(async (value) => {
+        .then(async value => {
           // `git add gradle.properties`
           await git_add(gradle_file)
         })
@@ -221,7 +221,7 @@ export async function updateChangelog(
 
       fs.promises
         .writeFile(changelog_file, result, 'utf8')
-        .then(async (value) => {
+        .then(async value => {
           // `git add CHANGELOG.md`
           await git_add(changelog_file)
         })
@@ -271,39 +271,30 @@ export async function updateGithubWorkflow(
       `Found ${filesToUpdate.length} files containing [ChrisCarini/intellij-platform-plugin-verifier-action]...`
     )
 
-    filesToUpdate.forEach(file => {
-      fs.readFile(file, 'utf8', (err, data) => {
-        if (err) {
-          return core.setFailed(`Error reading ${file}: ${err}`)
-        }
-        // core.debug('File contents:')
-        // core.debug(data)
+    for (const file of filesToUpdate) {
+      const data = fs.readFileSync(file, 'utf8')
+      const result = data
+        .replace(
+          new RegExp(`ideaIC:${current_platform_version}`, 'gm'),
+          `ideaIC:${new_version}`
+        )
+        .replace(
+          new RegExp(`ideaIU:${current_platform_version}`, 'gm'),
+          `ideaIU:${new_version}`
+        )
 
-        const result = data
-          .replace(
-            new RegExp(`ideaIC:${current_platform_version}`, 'gm'),
-            `ideaIC:${new_version}`
-          )
-          .replace(
-            new RegExp(`ideaIU:${current_platform_version}`, 'gm'),
-            `ideaIU:${new_version}`
-          )
+      core.debug('Updated file contents:')
+      core.debug(result)
 
-        // core.debug('Updated file contents:')
-        // core.debug(result)
+      await fs.promises.writeFile(file, result, 'utf8')
 
-        fs.promises
-          .writeFile(file, result, 'utf8')
-          .then(async (value) => {
-            // `git add <current_workflow_file>`
-            await git_add(file)
-          })
-          .catch(reason => {
-            return core.setFailed(`Error writing ${file}: ${reason}`)
-          })
-      })
+      core.debug(`${file} file written; about to git add...`)
+
+      // `git add <current_workflow_file>`
+      await git_add(file)
+
       core.debug(`Completed [${file}] file.`)
-    })
+    }
 
     core.debug(
       `Completed updating ${filesToUpdate.length} GitHub workflow files.`

@@ -149,3 +149,8 @@ async function run(): Promise<void> {
 }
 
 run()
+  .then(() => {})
+  .catch((err) => {
+    core.setFailed(err.message)
+    core.debug(err)
+  })

@@ -7,7 +7,7 @@ import {readFileSync} from 'fs'
 import simpleGit from 'simple-git'
 
 async function git_add(file: string): Promise<void> {
-  simpleGit()
+  await simpleGit()
     .exec(() => core.debug(`Starting 'git add ${file}'...`))
     .add(file)
     .exec(() => core.debug(`Finished 'git add ${file}'...`))

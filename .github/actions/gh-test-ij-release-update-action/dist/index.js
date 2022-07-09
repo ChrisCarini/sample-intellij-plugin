@@ -52,7 +52,7 @@ const fs_1 = __nccwpck_require__(7147);
 const simple_git_1 = __importDefault(__nccwpck_require__(9103));
 function git_add(file) {
     return __awaiter(this, void 0, void 0, function* () {
-        (0, simple_git_1.default)()
+        yield (0, simple_git_1.default)()
             .exec(() => core.debug(`Starting 'git add ${file}'...`))
             .add(file)
             .exec(() => core.debug(`Finished 'git add ${file}'...`));

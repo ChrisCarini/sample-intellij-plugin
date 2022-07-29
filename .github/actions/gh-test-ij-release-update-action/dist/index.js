@@ -112,7 +112,7 @@ function updateGradleProperties(new_version) {
             const obj = properties.parse((0, fs_1.readFileSync)(gradle_file, 'utf-8'), {
                 namespaces: true,
                 sections: true,
-                variables: true
+                variables: true,
             });
             core.debug(`properties:`);
             // @ts-ignore
@@ -144,9 +144,7 @@ function updateGradleProperties(new_version) {
             // `git add gradle.properties`
             yield git_add(gradle_file);
             core.debug('Completed [gradle.properties] file.');
-            return current_platform_version
-                ? current_platform_version
-                : new semver.SemVer('0.0.0');
+            return current_platform_version ? current_platform_version : new semver.SemVer('0.0.0');
         }
         catch (error) {
             if (error instanceof Error) {
@@ -210,7 +208,7 @@ function updateGithubWorkflow(current_platform_version, new_version) {
             const globber = yield glob.create('./.github/workflows/*');
             const files = yield globber.glob();
             core.debug(`Found ${files.length} files...`);
-            const filesToUpdate = files.filter(file => {
+            const filesToUpdate = files.filter((file) => {
                 return _fileContains(file, 'uses: ChrisCarini/intellij-platform-plugin-verifier-action');
             });
             core.debug(`Found ${filesToUpdate.length} files containing [ChrisCarini/intellij-platform-plugin-verifier-action]...`);
@@ -380,13 +378,13 @@ function checkFileChangeCount() {
         core.debug(`Files created:  ${statusResult.created.length}`);
         core.debug(`Files modified: ${statusResult.modified.length}`);
         core.debug(`Files deleted:  ${statusResult.deleted.length}`);
-        statusResult.created.forEach(value => {
+        statusResult.created.forEach((value) => {
             core.debug(`C --> ${value}`);
         });
-        statusResult.modified.forEach(value => {
+        statusResult.modified.forEach((value) => {
             core.debug(`M --> ${value}`);
         });
-        statusResult.deleted.forEach(value => {
+        statusResult.deleted.forEach((value) => {
             core.debug(`D --> ${value}`);
         });
         return statusResult.modified.length;
@@ -440,19 +438,19 @@ function run() {
             const repo = 'sample-intellij-plugin';
             const currentRemoteBranches = yield octokit.rest.repos.listBranches({
                 owner,
-                repo
+                repo,
             });
             // core.debug(`currentRemoteBranches: ${currentRemoteBranches}`)
             // core.debug(JSON.stringify(currentRemoteBranches))
-            const currentRemoteBranchNames = currentRemoteBranches.data.map(obj => obj.name);
+            const currentRemoteBranchNames = currentRemoteBranches.data.map((obj) => obj.name);
             core.debug(`currentRemoteBranchNames: ${currentRemoteBranchNames}`);
             const currentPullRequests = yield octokit.rest.pulls.list({
                 owner,
-                repo
+                repo,
             });
             // core.debug(`currentPullRequests: ${currentPullRequests}`)
             // core.debug(JSON.stringify(currentPullRequests))
-            const currentPullRequestBranchNames = currentPullRequests.data.map(obj => obj.head.ref);
+            const currentPullRequestBranchNames = currentPullRequests.data.map((obj) => obj.head.ref);
             core.debug(`currentPullRequestBranchNames: ${currentPullRequestBranchNames}`);
             if (currentRemoteBranchNames.includes(newBranchName) && currentPullRequestBranchNames.includes(newBranchName)) {
                 core.debug(`${newBranchName} - BRANCH ALREADY EXISTS ON REMOTE`);
@@ -484,7 +482,7 @@ function run() {
                     title: `Upgrading IntelliJ to ${latestVersion}`,
                     body: `Please pull these awesome changes in! We are upgrading IntelliJ to ${latestVersion}`,
                     head: newBranchName,
-                    base: 'master'
+                    base: 'master',
                 });
                 core.debug(`OPENED PR FOR BRANCH [${newBranchName}]!!!`);
             }
@@ -497,7 +495,7 @@ function run() {
 }
 run()
     .then(() => { })
-    .catch(err => {
+    .catch((err) => {
     core.setFailed(err.message);
     core.debug(err);
 });

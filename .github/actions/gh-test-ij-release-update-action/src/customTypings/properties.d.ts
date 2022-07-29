@@ -9,7 +9,7 @@ declare module 'properties' {
      * If this option is used, the callback is mandatory.
      * It gets 2 parameters, a possible error and the object with all the properties.
      */
-    path?: boolean
+    path?: boolean;
 
     /**
      * Allows you to add additional comment tokens.
@@ -21,7 +21,7 @@ declare module 'properties' {
      * @example
      * comments: [";", "&#064;"]
      */
-    comments?: string | string[]
+    comments?: string | string[];
 
     /**
      * Allows you to add additional separator tokens.
@@ -33,13 +33,13 @@ declare module 'properties' {
      * @example
      * separators: ["-", ">"]
      */
-    separators?: string | string[]
+    separators?: string | string[];
 
     /**
      * This option can be used with the `comments` and `separators` options.
      * If true, **only** the tokens specified in these options are used to parse comments and separators.
      */
-    strict?: boolean
+    strict?: boolean;
 
     /**
      * Parses INI sections.
@@ -47,7 +47,7 @@ declare module 'properties' {
      *
      * @link https://www.npmjs.com/package/properties#ini
      */
-    sections?: boolean
+    sections?: boolean;
 
     /**
      * Parses dot separated keys as JavaScript objects.
@@ -55,7 +55,7 @@ declare module 'properties' {
      * Look at the namespaces section for further details.
      * @link https://www.npmjs.com/package/properties#namespaces
      */
-    namespaces?: boolean
+    namespaces?: boolean;
 
     /**
      * Allows you to read the value of a key while the file is being parsed.
@@ -63,7 +63,7 @@ declare module 'properties' {
      * Look at the variables section for further details.
      * @link https://www.npmjs.com/package/properties#variables
      */
-    variables?: boolean
+    variables?: boolean;
 
     /**
      * External variables can be passed to the file if the variables option is enabled.
@@ -71,7 +71,7 @@ declare module 'properties' {
      * Look at the variables section for further details.
      * @link https://www.npmjs.com/package/properties#variables
      */
-    vars?: boolean
+    vars?: boolean;
 
     /**
      * Files can be linked and imported with the include key.
@@ -80,7 +80,7 @@ declare module 'properties' {
      * Look at the include section for further details.
      * @link https://www.npmjs.com/package/properties#include
      */
-    include?: boolean
+    include?: boolean;
 
     /**
      * Each property or section can be removed or modified from the final object.
@@ -105,11 +105,11 @@ declare module 'properties' {
      * Look at the reviver example for further details.
      * @link https://github.com/gagle/node-properties/blob/master/examples/reviver/reviver.js
      */
-    reviver?: (this: Context, key: any, value: any) => any
+    reviver?: (this: Context, key: any, value: any) => any;
   }
 
   export interface Context {
-    assert(): any
+    assert(): any;
   }
 
   /**
@@ -118,7 +118,7 @@ declare module 'properties' {
    * @param data
    * @param options
    */
-  export function parse(data: string, options?: ParseOptions): object
+  export function parse(data: string, options?: ParseOptions): object;
 
   /**
    * Parses a .properties string.
@@ -132,8 +132,8 @@ declare module 'properties' {
   export function parse(
     data: string,
     options: ParseOptions | undefined,
-    cb: (err: any, result: {[key: string]: unknown} | undefined) => void
-  ): void
+    cb: (err: any, result: { [key: string]: unknown } | undefined) => void
+  ): void;
 
   export interface StringifyOptions {
     /**
@@ -142,21 +142,21 @@ declare module 'properties' {
      * If this option is used, the callback is mandatory.
      * It gets two parameters, a possible error and the string.
      */
-    path?: string
+    path?: string;
 
     /**
      * The token to use to write comments.
      * It must be a single printable non-whitespace ascii character.
      * @default `#`
      */
-    comment?: string
+    comment?: string;
 
     /**
      * The token to use to separate keys from values.
      * It must be a single printable non-whitespace ascii character.
      * @default `=`
      */
-    separator?: string
+    separator?: string;
 
     /**
      * The .properties specification uses iso 8859-1 (latin-1) as a default encoding.
@@ -168,7 +168,7 @@ declare module 'properties' {
      *
      * If you are in a platform that can handle utf8 strings, e.g. Node.js, you don't need to use this option.
      */
-    unicode?: boolean
+    unicode?: boolean;
 
     /**
      * Each property or section can be removed or modified from the final string.
@@ -193,7 +193,7 @@ declare module 'properties' {
      * Look at the replacer example for further details.
      * @link https://github.com/gagle/node-properties/blob/master/examples/replacer.js
      */
-    replacer?: (this: Context, key: string, value: any) => any
+    replacer?: (this: Context, key: string, value: any) => any;
   }
 
   /**
@@ -204,7 +204,7 @@ declare module 'properties' {
    * @param obj
    * @param options
    */
-  export function stringify(obj: object, options?: StringifyOptions): string
+  export function stringify(obj: object, options?: StringifyOptions): string;
 
   /**
    * Stringifies an `object` or a `Stringifier`.
@@ -221,7 +221,7 @@ declare module 'properties' {
     obj: object,
     options: StringifyOptions | undefined,
     cb: (err: any, result: string) => void
-  ): void
+  ): void;
 
   /**
    * This class is used when you want to add sections or comments to the final string.
@@ -237,7 +237,7 @@ declare module 'properties' {
      * It will be written to the top of the final string.
      * Returns the Stringifier being used.
      */
-    header(comment: string): this
+    header(comment: string): this;
 
     /**
      * Writes a property line.
@@ -245,7 +245,7 @@ declare module 'properties' {
      * Both the key and the value are converted into a string automatically.
      * Returns the Stringifier being used.
      */
-    property(obj: {key?: any; value?: any; comment?: string}): this
+    property(obj: { key?: any; value?: any; comment?: string }): this;
 
     /**
      * Writes a section line.
@@ -254,11 +254,11 @@ declare module 'properties' {
      * If you don't need to write a comment, you can pass the name instead of an object.
      * Returns the stringifier being used.
      */
-    section(obj: string | {name: string; comment?: string}): this
+    section(obj: string | { name: string; comment?: string }): this;
   }
 
   /**
    * Returns a new `Stringifier` instance.
    */
-  export function createStringifier(): Stringifier
+  export function createStringifier(): Stringifier;
 }

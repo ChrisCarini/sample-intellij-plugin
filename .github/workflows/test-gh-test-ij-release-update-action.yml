@@ -1,11 +1,8 @@
 name: 'IJ Release Update'
-on: # rebuild any PRs and main branch changes
-  pull_request:
 
-  push:
-    branches:
-      - main
-      - 'releases/*'
+on:
+  schedule:
+    - cron: "0 0 * * *"
 
   workflow_dispatch:
 
@@ -17,6 +14,6 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}
 
-      - uses: ./.github/actions/gh-test-ij-release-update-action
+      - uses: ChrisCarini/gh-test-ij-release-update-action@main
         with:
           PAT_TOKEN_FOR_IJ_UPDATE_ACTION: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}

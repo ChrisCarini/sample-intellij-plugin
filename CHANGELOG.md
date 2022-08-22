@@ -6,6 +6,7 @@
 ### Added
 
 ### Changed
+- Upgrading IntelliJ to 0.0.0
 
 ### Deprecated
 

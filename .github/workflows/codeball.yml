@@ -1,5 +1,8 @@
 name: Codeball
-on: [pull_request]
+on:
+  pull_request: {}
+  pull_request_review_comment:
+    types: [created, edited]
 
 jobs:
   codeball_job:
@@ -9,9 +12,10 @@ jobs:
       # Run Codeball on all new Pull Requests 🚀
       # For customizations and more documentation, see https://github.com/sturdy-dev/codeball-action
       - name: Codeball
-        uses: sturdy-dev/codeball-action@v1
+        uses: sturdy-dev/codeball-action@v2
         with:
           approvePullRequests: "true"
           labelPullRequestsWhenApproved: "true"
           labelPullRequestsWhenReviewNeeded: "true"
           failJobsWhenReviewNeeded: "false"
+          codeSuggestionsFromComments: "true"

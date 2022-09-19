@@ -80,7 +80,7 @@ jobs:
           git checkout -b $BRANCH
           git commit -am "Changelog update - $VERSION"
           git push --set-upstream origin $BRANCH
-              
+          
           # NOTE: THE BELOW PR DESCRIPTION IS TO GIVE DETAILS ON A WORKAROUND FOR A WORKFLOW-CREATED PR TO TRIGGER 
           #       SUBSEQUENT WORKFLOWS. SEE LINK BELOW FOR MORE DETAILS AND OTHER ALTERNATIVES:
           #       

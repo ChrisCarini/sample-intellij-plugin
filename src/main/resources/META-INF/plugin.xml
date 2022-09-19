@@ -9,6 +9,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <errorHandler implementation="com.chriscarini.jetbrains.sampleintellijplugin.actions.MyErrorReporter"/>
     </extensions>
 
     <actions>
@@ -16,6 +17,19 @@
         <group id="SamplePlugin.SampleMenu" text="Sample Plugin" description="Menu for 'Sample Plugin'">
             <add-to-group group-id="MainMenu" anchor="first"/>
         </group>
+
+        <group id="carini.foobar" internal="true"
+               class="com.chriscarini.jetbrains.sampleintellijplugin.actions.MyActionGroup" popup="true">
+            <add-to-group group-id="Internal"/>
+        </group>
+        <!-- Force an exception to be thrown. -->
+        <action id="LoCCOP.Force.Exception.Action"
+                internal="true"
+                class="com.chriscarini.jetbrains.sampleintellijplugin.actions.ForcePluginException">
+            <add-to-group
+                    group-id="carini.foobar"/> <!-- Hide this under the `Tools -> Internal Actions -> Exceptions` menu. -->
+            <add-to-group group-id="SamplePlugin.SampleMenu" anchor="first"/>
+        </action>
 
         <action class="com.chriscarini.jetbrains.sampleintellijplugin.actions.HelloAction" id="HelloAction">
             <add-to-group group-id="SamplePlugin.SampleMenu" anchor="first"/>

@@ -4,3 +4,21 @@ apply from: 'build_standard_jetbrains_plugin_build.gradle'
 changelog {
     repositoryUrl = "https://github.com/ChrisCarini/sample-intellij-plugin"
 }
+
+// Add mavenLocal to repositories so that a local snapshot can be pulled for lib
+repositories {
+    mavenLocal()
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+// Additional dependencies; specifically, one on a local snapshot of the java-lib-demo library
+dependencies {
+    implementation 'com.chriscarini.jetbrains:jetbrains-error-utils:0.0.1-SNAPSHOT'
+//    implementation 'com.google.guava:guava:31.0.1-jre'
+}

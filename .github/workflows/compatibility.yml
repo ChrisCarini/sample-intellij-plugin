@@ -27,6 +27,7 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu'
+          cache: gradle
 
       - name: Build the plugin
         run: ./gradlew buildPlugin

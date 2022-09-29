@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.ExtensionsKt
 import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
+import org.jetbrains.intellij.tasks.ListProductsReleasesTask.Channel
 
 import java.util.stream.Collectors
 
@@ -78,6 +79,9 @@ tasks {
     listProductsReleases {
         // In addition to `IC` (from `platformType`), we also want to verify against `IU`.
         types.set(Arrays.asList(properties('platformType'), 'IU'))
+
+        // Only get the released versions.
+        releaseChannels.set([Channel.RELEASE])
 
         // Verify against the most recent patch release of the `platformVersion` version
         // (ie, if `platformVersion` = 2022.2, and the latest patch release is `2022.2.2`,

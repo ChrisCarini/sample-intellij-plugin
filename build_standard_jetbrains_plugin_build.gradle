@@ -163,7 +163,7 @@ tasks {
         // ideVersions = Arrays.asList(properties("pluginVerifierIdeVersions").split(','))
 
         def failureLevels = getFailureLevels()
-        println "Using ${failureLevels.size()} Failure Levels: ${failureLevels}"
+        logger.debug("Using ${failureLevels.size()} Failure Levels: ${failureLevels}")
         failureLevel.set(failureLevels)
     }
 

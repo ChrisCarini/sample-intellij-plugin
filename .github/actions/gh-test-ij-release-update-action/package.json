@@ -36,7 +36,7 @@
     "@octokit/webhooks-definitions": "^3.67.3",
     "properties": "^1.2.1",
     "semver": "^7.3.7",
-    "simple-git": "^3.10.0"
+    "simple-git": "^3.15.0"
   },
   "devDependencies": {
     "@types/node": "^18.0.3",

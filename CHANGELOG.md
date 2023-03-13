@@ -6,7 +6,6 @@
 ### Added
 
 ### Changed
-- Upgrading IntelliJ from 2022.3.2 to 2022.3.3
 
 ### Deprecated
 
@@ -15,6 +14,10 @@
 ### Fixed
 
 ### Security
+
+## [0.3.3] - 2023-03-13
+### Changed
+- Upgrading IntelliJ from 2022.3.2 to 2022.3.3
 
 ## [0.3.2] - 2023-02-04
 ### Changed

@@ -1,25 +1,26 @@
-name: Codeball
-on:
-  pull_request: {}
-  pull_request_review_comment:
-    types: [created, edited]
-
-jobs:
-  codeball_job:
-    name: Codeball
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
-    steps:
-      # Run Codeball on all new Pull Requests 🚀
-      # For customizations and more documentation, see https://github.com/sturdy-dev/codeball-action
-      - name: Codeball
-        uses: sturdy-dev/codeball-action@v2
-        with:
-          approvePullRequests: "true"
-          labelPullRequestsWhenApproved: "true"
-          labelPullRequestsWhenReviewNeeded: "true"
-          failJobsWhenReviewNeeded: "false"
-          codeSuggestionsFromComments: "true"
+# DISABLED (2023-07-27) - Codeball website appears to be hard-down; see https://github.com/sturdy-dev/codeball-action/issues/197
+#name: Codeball
+#on:
+#  pull_request: {}
+#  pull_request_review_comment:
+#    types: [created, edited]
+#
+#jobs:
+#  codeball_job:
+#    name: Codeball
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      issues: write
+#      pull-requests: write
+#    steps:
+#      # Run Codeball on all new Pull Requests 🚀
+#      # For customizations and more documentation, see https://github.com/sturdy-dev/codeball-action
+#      - name: Codeball
+#        uses: sturdy-dev/codeball-action@v2
+#        with:
+#          approvePullRequests: "true"
+#          labelPullRequestsWhenApproved: "true"
+#          labelPullRequestsWhenReviewNeeded: "true"
+#          failJobsWhenReviewNeeded: "false"
+#          codeSuggestionsFromComments: "true"

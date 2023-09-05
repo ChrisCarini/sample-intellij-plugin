@@ -10,7 +10,7 @@ jobs:
   test-gh-test-ij-release-update-action: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           token: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}
 

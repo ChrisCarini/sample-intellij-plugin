@@ -8,6 +8,7 @@ changelog {
 // Add mavenLocal to repositories so that a local snapshot can be pulled for lib
 repositories {
     mavenLocal()
+    maven { url 'https://jitpack.io' }
 }
 
 idea {
@@ -19,6 +20,9 @@ idea {
 
 // Additional dependencies; specifically, one on a local snapshot of the java-lib-demo library
 dependencies {
-    implementation 'com.chriscarini.jetbrains:jetbrains-error-utils:0.0.1-SNAPSHOT'
+    implementation 'com.github.ChrisCarini:jetbrains-error-utils:ff27436659'
+//    implementation 'com.github.ChrisCarini:jetbrains-error-utils:main-SNAPSHOT' // BUILDING....
+//    implementation 'com.github.ChrisCarini:jetbrains-error-utils:0.0.1-SNAPSHOT' // DOES NOT WORK.
+//    implementation 'com.chriscarini.jetbrains:jetbrains-error-utils:0.0.1-SNAPSHOT'
 //    implementation 'com.google.guava:guava:31.0.1-jre'
 }

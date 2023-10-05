@@ -20,7 +20,10 @@ idea {
 
 // Additional dependencies; specifically, one on a local snapshot of the java-lib-demo library
 dependencies {
-    implementation 'com.github.ChrisCarini:jetbrains-error-utils:ff27436659'
+//    implementation 'com.github.ChrisCarini:jetbrains-error-utils:ff27436659' // WORKS FINE. TADA!
+    implementation 'com.chriscarini:jetbrains-error-utils:856c81f864' // WORKS FINE. TADA!
+
+
 //    implementation 'com.github.ChrisCarini:jetbrains-error-utils:main-SNAPSHOT' // BUILDING....
 //    implementation 'com.github.ChrisCarini:jetbrains-error-utils:0.0.1-SNAPSHOT' // DOES NOT WORK.
 //    implementation 'com.chriscarini.jetbrains:jetbrains-error-utils:0.0.1-SNAPSHOT'

@@ -35,7 +35,7 @@ jobs:
           cache: gradle
 
       - name: Build the plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin --stacktrace --debug --warning-mode all
 
       - name: Generate IDE Versions List
         run: ./gradlew generateIdeVersionsList

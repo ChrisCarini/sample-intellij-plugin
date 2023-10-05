@@ -65,7 +65,7 @@ jobs:
         id: properties
         shell: bash
         run: |
-          PROPERTIES="$(./gradlew properties --console=plain -q)"
+          PROPERTIES="$(./gradlew properties --console=plain -q  --stacktrace --debug --warning-mode all)"
           IDE_VERSIONS="$(echo "$PROPERTIES" | grep "^pluginVerifierIdeVersions:" | base64)"
 
           echo "ideVersions=$IDE_VERSIONS" >> $GITHUB_OUTPUT

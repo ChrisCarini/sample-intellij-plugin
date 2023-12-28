@@ -16,6 +16,31 @@
 
 ### Security
 
+## [0.6.2] - 2023-12-21
+
+### Changed
+- Upgrading IntelliJ from 2023.3.1 to 2023.3.2
+
+## [0.6.1] - 2023-12-14
+
+### Changed
+- Upgrading IntelliJ from 2023.3 to 2023.3.1
+
+## [0.6.0] - 2023-12-08
+
+### Changed
+- Upgrading IntelliJ from 2023.2.5 to 2023.3.0
+
+## [0.5.5] - 2023-11-10
+
+### Changed
+- Upgrading IntelliJ from 2023.2.4 to 2023.2.5
+
+## [0.5.4] - 2023-10-28
+
+### Changed
+- Upgrading IntelliJ from 2023.2.3 to 2023.2.4
+
 ## [0.5.3] - 2023-10-12
 
 ### Changed
@@ -153,7 +178,12 @@
 ### Added
 - Initial Revision. Laying the foundation.
 
-[Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.3...HEAD
+[Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.5...v0.6.0
+[0.5.5]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.4...v0.5.5
+[0.5.4]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.0...v0.5.1

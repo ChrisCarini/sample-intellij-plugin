@@ -15,7 +15,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.jetbrains.intellij.plugins:gradle-intellij-plugin:1.16.0'
+        classpath 'org.jetbrains.intellij.plugins:gradle-intellij-plugin:1.16.1'
         classpath 'org.jetbrains.changelog:org.jetbrains.changelog.gradle.plugin:2.1.0'
         classpath 'org.jetbrains.qodana:gradle-qodana-plugin:0.1.13'
     }
@@ -33,6 +33,14 @@ version properties("pluginVersion")
 
 repositories {
     mavenCentral()
+}
+
+idea {
+    project {
+        // Set default IntelliJ SDK & language level to the version specified in `gradle.properties`
+        jdkName = properties("javaVersion")
+        languageLevel = properties("javaVersion")
+    }
 }
 
 intellij {
@@ -245,8 +253,8 @@ dependencies {
     }
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation 'org.testng:testng:7.8.0'
-    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.testng:testng:7.9.0'
+    testImplementation 'org.mockito:mockito-core:5.8.0'
 }
 
 // Configure IntelliJ to be aware of Groovy and Gradle APIs to allow resolution and code completion of symbols in build.gradle

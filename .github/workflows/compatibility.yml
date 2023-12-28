@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Java 17
-        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
         with:
           java-version: 17
           distribution: 'zulu'
@@ -43,7 +43,7 @@ jobs:
       # https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
       # https://github.com/jlumbroso/free-disk-space
       - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@f68fdb76e2ea636224182cfb7377ff9a1708f9b8 # v1.3.0
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           # this remove tools (actions/setup-java) that are needed; hence, disable.
           tool-cache: false

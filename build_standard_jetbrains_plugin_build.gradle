@@ -15,7 +15,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.jetbrains.intellij.plugins:gradle-intellij-plugin:1.17.0'
+        classpath 'org.jetbrains.intellij.plugins:gradle-intellij-plugin:1.17.2'
         classpath 'org.jetbrains.changelog:org.jetbrains.changelog.gradle.plugin:2.1.0'
         classpath 'org.jetbrains.qodana:gradle-qodana-plugin:0.1.13'
     }
@@ -110,6 +110,8 @@ tasks {
                                 .collect(Collectors.joining('\n'))
                 )
         )
+        sinceBuild.set(properties('pluginSinceBuild'))
+        untilBuild.set(properties('pluginUntilBuild'))
 
         def changeLogForVersion = changelog.getOrNull(properties("pluginVersion"))
         changeNotes.set((changeLogForVersion != null ? changeLogForVersion : changelog.getLatest()).toHTML())
@@ -121,8 +123,9 @@ tasks {
         // Contrary to above, we want to speed up CI, so skip verification of `IU`.
         types.set(Arrays.asList(properties('platformType')))
 
-        // Only get the released versions.
-        releaseChannels.set([Channel.RELEASE])
+        // Only get the released versions if we are not targeting an EAP.
+        def isEAP = properties("pluginVersion").endsWith('-EAP')
+        releaseChannels.set([isEAP ? Channel.EAP : Channel.RELEASE])
 
         // Verify against the most recent patch release of the `platformVersion` version
         // (ie, if `platformVersion` = 2022.2, and the latest patch release is `2022.2.2`,
@@ -254,7 +257,7 @@ dependencies {
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation 'org.testng:testng:7.9.0'
-    testImplementation 'org.mockito:mockito-core:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
 }
 
 // Configure IntelliJ to be aware of Groovy and Gradle APIs to allow resolution and code completion of symbols in build.gradle

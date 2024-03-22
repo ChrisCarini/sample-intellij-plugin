@@ -30,6 +30,10 @@
 
 ### Changed
 - Upgrading IntelliJ from 2023.3.3 to 2023.3.4
+
+## [0.6.3] - 2024-01-30
+
+### Changed
 - Upgrading IntelliJ from 2023.3.2 to 2023.3.3
 
 ## [0.6.2] - 2023-12-21
@@ -197,7 +201,8 @@
 [Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.6...HEAD
 [0.6.6]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.4...v0.6.5
-[0.6.4]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.2...v0.6.4
+[0.6.4]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.3...v0.6.4
+[0.6.3]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.5.5...v0.6.0

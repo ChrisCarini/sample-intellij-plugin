@@ -7,7 +7,6 @@
 ### Added
 
 ### Changed
-- Upgrading IntelliJ from 2023.3.6 to 2024.1.0
 
 ### Deprecated
 
@@ -16,6 +15,11 @@
 ### Fixed
 
 ### Security
+
+## [1.0.0] - 2024-04-05
+
+### Changed
+- Upgrading IntelliJ from 2023.3.6 to 2024.1.0
 
 ## [0.6.6] - 2024-03-22
 
@@ -199,7 +203,8 @@
 ### Added
 - Initial Revision. Laying the foundation.
 
-[Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.6...HEAD
+[Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.6...v1.0.0
 [0.6.6]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v0.6.3...v0.6.4

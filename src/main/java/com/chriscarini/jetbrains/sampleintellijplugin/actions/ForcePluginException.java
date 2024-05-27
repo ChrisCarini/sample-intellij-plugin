@@ -1,6 +1,7 @@
 package com.chriscarini.jetbrains.sampleintellijplugin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -27,6 +28,11 @@ public class ForcePluginException extends DumbAwareAction {
 
     public ForcePluginException() {
         super(FORCE_EXCEPTION, DESCRIPTION, AllIcons.Debugger.Db_exception_breakpoint);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

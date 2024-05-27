@@ -1,12 +1,15 @@
 package com.chriscarini.jetbrains.sampleintellijplugin.actions;
 
-import com.chriscarini.jetbrains.diagnostic.reporter.GitHubErrorReportSubmitter;
-import org.jetbrains.annotations.NotNull;
+import com.chriscarini.jetbrains.diagnostic.reporter.multi.submitter.GitHubAndJetBrainsMarketplaceSubmitter;
 
-public class MyErrorReporter extends GitHubErrorReportSubmitter {
+import static com.chriscarini.jetbrains.sampleintellijplugin.actions.Constants.*;
 
-    @Override
-    public @NotNull String gitHubRepoUrl() {
-        return "https://github.com/chriscarini/sample-intellij-plugin";
-    }
+import static com.chriscarini.jetbrains.sampleintellijplugin.actions.Constants.*;
+
+
+public class MyErrorReporter extends GitHubAndJetBrainsMarketplaceSubmitter {
+
+  public MyErrorReporter() {
+    super(PLUGIN_ID, GITHUB_REPO_URL_PROD, GITHUB_REPO_URL_STAG, GITHUB_ASSIGNEES, GITHUB_BUGS, "\uD83D\uDC1B " + "Report to ChrisCarini");
+  }
 }

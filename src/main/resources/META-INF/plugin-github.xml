@@ -1,0 +1,8 @@
+<!--
+NOTE: We don't currently have/need any extension points from the GitHub plugin, but since we want to leverage the
+GitHubErrorReportSubmitter, we need to depend on the GitHub plugin.
+-->
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+  </extensions>
+</idea-plugin>

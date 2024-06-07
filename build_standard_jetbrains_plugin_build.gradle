@@ -43,6 +43,10 @@ idea {
         jdkName = properties("javaVersion")
         languageLevel = properties("javaVersion")
     }
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }
 
 intellij {
@@ -52,7 +56,13 @@ intellij {
     downloadSources.set(properties("platformDownloadSources").toBoolean())
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").length() == 0 ? [] : Arrays.asList(properties("platformPlugins").split(',')))
+    def pluginIds = properties("platformPlugins").length() == 0 ? [] : Arrays.asList(properties("platformPlugins").split(','))
+    
+    // NOTE: A dependency on the GitHub IntelliJ plugin is specified in order to use the 
+    // GitHubErrorReportSubmitter from `jetbrains-error-utils`.
+    pluginIds.add('org.jetbrains.plugins.github')
+    
+    plugins.set(pluginIds)
 }
 
 // Configure CHANGELOG.md - https://github.com/JetBrains/gradle-changelog-plugin
@@ -256,6 +266,8 @@ dependencies {
     buildscript.configurations.classpath.each { file ->
         provided files(file)
     }
+
+    implementation 'com.chriscarini.jetbrains:jetbrains-error-utils:0.0.4.0'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation 'org.testng:testng:7.10.2'

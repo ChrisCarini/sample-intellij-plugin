@@ -54,13 +54,13 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         timeout-minutes: 1
 
-      # Setup Java 17 environment for the next steps
-      - name: Setup Java 17
+      # Setup Java environment for the next steps
+      - name: Setup Java
         uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         timeout-minutes: 5
         with:
           distribution: zulu
-          java-version: 17
+          java-version: 21
           cache: gradle
 
       # Set environment variables
@@ -117,13 +117,13 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         timeout-minutes: 1
 
-      # Setup Java 17 environment for the next steps
-      - name: Setup Java 17
+      # Setup Java environment for the next steps
+      - name: Setup Java
         uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         timeout-minutes: 5
         with:
           distribution: zulu
-          java-version: 17
+          java-version: 21
           cache: gradle
 
       # Set environment variables

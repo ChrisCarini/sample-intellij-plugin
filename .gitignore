@@ -12,3 +12,5 @@ private.pem
 chain.crt
 *.DS_Store
 .idea/
+.installedPlugins/
+.intellijPlatform/

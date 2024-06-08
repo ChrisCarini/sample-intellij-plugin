@@ -1,8 +1,9 @@
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
-import org.jetbrains.intellij.tasks.ListProductsReleasesTask.Channel
-import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import java.util.EnumSet
 
 fun properties(key: String): Provider<String> = providers.gradleProperty(key)
@@ -12,7 +13,8 @@ fun extra(key: String): String = project.ext.get(key) as String
 plugins {
     id("java")
     id("idea")
-    id("org.jetbrains.intellij") version "1.17.3"
+    id("org.jetbrains.intellij.platform") version "2.0.0-beta6"
+    id("org.jetbrains.intellij.platform.migration") version "2.0.0-beta6"
     id("org.jetbrains.changelog") version "2.2.0"
     id("com.dorongold.task-tree") version "3.0.0" // provides `taskTree` task (e.g. `./gradlew build taskTree`; docs: https://github.com/dorongold/gradle-task-tree)
 }
@@ -22,6 +24,14 @@ version = properties("pluginVersion").get()
 
 repositories {
     mavenCentral()
+    
+    // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-repositories-extension.html
+    intellijPlatform {
+        defaultRepositories()
+        // `jetbrainsRuntime()` is necessary mostly for EAP/SNAPSHOT releases of IJ so that the IDE pulls the correct JBR
+        //      - https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-jetbrains-runtime.html#obtained-with-intellij-platform-from-maven
+        jetbrainsRuntime()
+    }
 }
 
 idea {
@@ -37,56 +47,31 @@ java {
     targetCompatibility = JavaVersion.toVersion(properties("javaVersion").get())
 }
 
-intellij {
-    pluginName = properties("pluginName")
-    version = properties("platformVersion")
-    type = properties("platformType")
-    downloadSources = properties("platformDownloadSources").get().toBoolean()
-
-    // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins = properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
+val isNotCI = System.getenv("CI") != "true"
+if (isNotCI) {
+    // The below file (jetbrainsCredentials.gradle) should contain the below:
+    //     project.ext.set("intellijSignPluginCertificateChain", new File("./chain.crt").getText("UTF-8"))
+    //     project.ext.set("intellijSignPluginPrivateKey", new File("./private.pem").getText("UTF-8"))
+    //     project.ext.set("intellijSignPluginPassword", "YOUR_PRIV_KEY_PASSWORD_HERE")
+    //     project.ext.set("intellijPluginPublishToken", "YOUR_TOKEN_HERE")
+    //
+    // Because this contains credentials, this file is also included in .gitignore file.
+    apply(from = "jetbrainsCredentials.gradle")
 }
+fun resolve(extraKey: String, environmentKey: String): String = if (isNotCI) extra(extraKey) else environment(environmentKey).get()
+val signPluginCertificateChain = resolve("intellijSignPluginCertificateChain", "CERTIFICATE_CHAIN")
+val signPluginPrivateKey = resolve("intellijSignPluginPrivateKey", "PRIVATE_KEY")
+val signPluginPassword = resolve("intellijSignPluginPassword", "PRIVATE_KEY_PASSWORD")
+val publishPluginToken = resolve("intellijPluginPublishToken", "PUBLISH_TOKEN")
 
-// Configure CHANGELOG.md - https://github.com/JetBrains/gradle-changelog-plugin
-changelog {
-    repositoryUrl = properties("pluginRepositoryUrl")
-}
-
-fun getFailureLevels(): EnumSet<FailureLevel> {
-    val includeFailureLevels = EnumSet.allOf(FailureLevel::class.java)
-    val desiredFailureLevels = properties("pluginVerifierExcludeFailureLevels").get()
-        .split(",")
-        .map(String::trim)
-        .filter(String::isNotEmpty) // Remove empty strings; this happens when user sets nothing (ie, `pluginVerifierExcludeFailureLevels =`)
-
-    desiredFailureLevels.forEach { failureLevel ->
-        when (failureLevel) {
-            "ALL" -> return EnumSet.allOf(FailureLevel::class.java)
-            "NONE" -> return EnumSet.noneOf(FailureLevel::class.java)
-            else -> {
-                try {
-                    val enumFailureLevel = FailureLevel.valueOf(failureLevel)
-                    includeFailureLevels.remove(enumFailureLevel)
-                } catch (ignored: Exception) {
-                    val msg = "Failure Level \"$failureLevel\" is *NOT* valid. Please select from: ${EnumSet.allOf(FailureLevel::class.java)}."
-                    logger.error(msg)
-                    throw Exception(msg)
-                }
-            }
-        }
-    }
-
-    return includeFailureLevels
-}
-
-tasks {
-    patchPluginXml {
-        version = properties("pluginVersion")
-        sinceBuild = properties("pluginSinceBuild")
-        untilBuild = properties("pluginUntilBuild")
+// https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
+intellijPlatform {
+    pluginConfiguration {
+        name = properties("pluginName").get()
+        version = properties("pluginVersion").get()
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+        description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
             val start = "<!-- Plugin description -->"
             val end = "<!-- Plugin description end -->"
 
@@ -110,32 +95,154 @@ tasks {
                 )
             }
         }
+
+        ideaVersion {
+            sinceBuild = properties("pluginSinceBuild")
+            untilBuild = properties("pluginUntilBuild")
+        }
+
+        // Vendor information -> https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html#intellijPlatform-pluginConfiguration-vendor
+        vendor {
+            name = "Chris Carini"
+            email = "jetbrains@chriscarini.com"
+            url = "https://jetbrains.chriscarini.com"
+        }
     }
 
-    listProductsReleases {
+    publishing {
+        token = publishPluginToken
+
+        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+        // https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html#specifying-a-release-channel
+        channels = properties("pluginVersion")
+            .map { 
+                listOf(
+                    it
+                        .substringAfter('-', "")
+                        .substringBefore('.')
+                        .lowercase()
+                        .ifEmpty { "default" }
+                )
+            }
+    }
+
+    signing {
+        certificateChain = signPluginCertificateChain
+        privateKey = signPluginPrivateKey
+        password = signPluginPassword
+    }
+
+    verifyPlugin {
+        // TODO(ChrisCarini) - Using the below will cause to fail because of `IDE must reside in a directory: `.
+        //  See https://jetbrains-platform.slack.com/archives/C05C80200LS/p1716279125890439 for more details and
+        //  hopefully a status update.
+        freeArgs = listOf("-mute TemplateWordInPluginName")
+        // Leave `ideVersions` commented out so that the `listProductsReleases` task will execute.
+        // If no `ideVersions` is specified, the output from the `listProductsReleases` will be used.
+        //
+        // NOTE: I use the `listProductsReleases` task and `generateIdeVersionsList` task for the
+        // `ChrisCarini/intellij-platform-plugin-verifier-action` GitHub Action to verify on CI.
+        // ideVersions = Arrays.asList(properties("pluginVerifierIdeVersions").split(","))
+
+        val failureLevels = getFailureLevels()
+        logger.debug("Using ${failureLevels.size} Failure Levels: $failureLevels")
+        failureLevel.set(failureLevels)
+        ides {
+            val version = properties("platformVersion").get()
+            val type = properties("platformType").get()
+            logger.lifecycle("Verifying against IntelliJ Platform $type $version")
+            ide(IntelliJPlatformType.fromCode(type), version)
+            
+            recommended()
+        }
+    }
+}
+
+// Configure CHANGELOG.md - https://github.com/JetBrains/gradle-changelog-plugin
+changelog {
+    repositoryUrl = properties("pluginRepositoryUrl")
+}
+
+fun getFailureLevels(): EnumSet<VerifyPluginTask.FailureLevel> {
+    val includeFailureLevels = EnumSet.allOf(VerifyPluginTask.FailureLevel::class.java)
+    val desiredFailureLevels = properties("pluginVerifierExcludeFailureLevels").get()
+        .split(",")
+        .map(String::trim)
+        .filter(String::isNotEmpty) // Remove empty strings; this happens when user sets nothing (ie, `pluginVerifierExcludeFailureLevels =`)
+
+    desiredFailureLevels.forEach { failureLevel ->
+        when (failureLevel) {
+            "ALL" -> return EnumSet.allOf(VerifyPluginTask.FailureLevel::class.java)
+            "NONE" -> return EnumSet.noneOf(VerifyPluginTask.FailureLevel::class.java)
+            else -> {
+                try {
+                    val enumFailureLevel = VerifyPluginTask.FailureLevel.valueOf(failureLevel)
+                    includeFailureLevels.remove(enumFailureLevel)
+                } catch (ignored: Exception) {
+                    val msg = "Failure Level \"$failureLevel\" is *NOT* valid. Please select from: ${EnumSet.allOf(VerifyPluginTask.FailureLevel::class.java)}."
+                    logger.error(msg)
+                    throw Exception(msg)
+                }
+            }
+        }
+    }
+
+    return includeFailureLevels
+}
+
+tasks {
+    printProductsReleases {
 //        // In addition to `IC` (from `platformType`), we also want to verify against `IU`.
 //        types.set(Arrays.asList(properties("platformType"), "IU"))
         // Contrary to above, we want to speed up CI, so skip verification of `IU`.
-        types = listOf(properties("platformType").get())
+        val type = properties("platformType").get()
+        types = listOf(IntelliJPlatformType.fromCode(type))
 
         // Only get the released versions if we are not targeting an EAP.
-        val isEAP = properties("pluginVersion").get().endsWith("-EAP")
-        releaseChannels = listOf(if (isEAP) Channel.EAP else Channel.RELEASE)
+        val isEAP = properties("pluginVersion").get().uppercase().endsWith("-EAP")
+        channels = listOf(if (isEAP) ProductRelease.Channel.EAP else ProductRelease.Channel.RELEASE)
 
         // Verify against the most recent patch release of the `platformVersion` version
         // (ie, if `platformVersion` = 2022.2, and the latest patch release is `2022.2.2`,
         // then the `sinceVersion` will be set to `2022.2.2` and *NOT* `2022.2`.
-        sinceVersion.set(properties("platformVersion"))
+        sinceBuild.set(properties("platformVersion"))
+    }
+
+    // Sanity check task to ensure necessary variables are set.
+    register("checkJetBrainsSecrets") {
+        doLast {
+            println("signPluginCertificateChain: ${if (signPluginCertificateChain.isNotEmpty()) "IS" else "is NOT"} set.")
+            println("signPluginPrivateKey:       ${if (signPluginPrivateKey.isNotEmpty()) "IS" else "is NOT"} set.")
+            println("signPluginPassword:         ${if (signPluginPassword.isNotEmpty()) "IS" else "is NOT"} set.")
+            println("publishPluginToken:         ${if (publishPluginToken.isNotEmpty()) "IS" else "is NOT"} set.")
+        }
+    }
+
+    // In "IntelliJ Platform Gradle Plugin 2.*", the `listProductsReleases` task no longer exists, but
+    // instead the `printProductReleases` task does. This task is necassary to take the output of 
+    // `printProductReleases` and write it to a file for use in the `generateIdeVersionsList` task below.
+    val listProductReleasesTaskName = "listProductsReleases"
+    register(listProductReleasesTaskName) {
+        dependsOn(printProductsReleases)
+        val outputF = layout.buildDirectory.file("listProductsReleases.txt").also {
+            outputs.file(it)
+        }
+        val content = printProductsReleases.flatMap { it.productsReleases }.map { it.joinToString("\n") }
+
+        doLast {
+            outputF.orNull?.asFile?.writeText(content.get())
+        }
     }
 
     // Task to generate the necessary format for `ChrisCarini/intellij-platform-plugin-verifier-action` GitHub Action.
     register("generateIdeVersionsList") {
-        dependsOn(project.tasks.named("listProductsReleases"))
+        dependsOn(project.tasks.named(listProductReleasesTaskName))
         doLast {
             val ideVersionsList = mutableListOf<String>()
 
             // Include the versions produced from the `listProductsReleases` task.
-            project.tasks.named("listProductsReleases").get().outputs.files.singleFile.forEachLine { line ->
+            project.tasks.named(listProductReleasesTaskName).get().outputs.files.singleFile.forEachLine { line ->
                 ideVersionsList.add("idea" + line.replace("-", ":"))
             }
 
@@ -156,19 +263,6 @@ tasks {
         }
     }
 
-    runPluginVerifier {
-        // Leave `ideVersions` commented out so that the `listProductsReleases` task will execute.
-        // If no `ideVersions` is specified, the output from the `listProductsReleases` will be used.
-        //
-        // NOTE: I use the `listProductsReleases` task and `generateIdeVersionsList` task for the
-        // `ChrisCarini/intellij-platform-plugin-verifier-action` GitHub Action to verify on CI.
-        // ideVersions = Arrays.asList(properties("pluginVerifierIdeVersions").split(","))
-
-        val failureLevels = getFailureLevels()
-        logger.debug("Using ${failureLevels.size} Failure Levels: $failureLevels")
-        failureLevel.set(failureLevels)
-    }
-
     withType<JavaCompile> {
         options.compilerArgs.addAll(
             listOf(
@@ -183,58 +277,29 @@ tasks {
             )
         )
     }
-
-    if (System.getenv("CI") != "true") {
-        // The below file (jetbrainsCredentials.gradle) should contain the below:
-        //     project.ext.set("intellijSignPluginCertificateChain", new File("./chain.crt").getText("UTF-8"))
-        //     project.ext.set("intellijSignPluginPrivateKey", new File("./private.pem").getText("UTF-8"))
-        //     project.ext.set("intellijSignPluginPassword", "YOUR_PRIV_KEY_PASSWORD_HERE")
-        //     project.ext.set("intellijPluginPublishToken", "YOUR_TOKEN_HERE")
-        //
-        // Because this contains credentials, this file is also included in .gitignore file.
-        apply(from = "jetbrainsCredentials.gradle")
-    }
-
-    val isNotCI = System.getenv("CI") != "true"
-    fun resolve(extraKey: String, environmentKey: String): String = if (isNotCI) extra(extraKey) else environment(environmentKey).get()
-    val signPluginCertificateChain = resolve("intellijSignPluginCertificateChain", "CERTIFICATE_CHAIN")
-    val signPluginPrivateKey = resolve("intellijSignPluginPrivateKey", "PRIVATE_KEY")
-    val signPluginPassword = resolve("intellijSignPluginPassword", "PRIVATE_KEY_PASSWORD")
-    val publishPluginToken = resolve("intellijPluginPublishToken", "PUBLISH_TOKEN")
-
-    signPlugin {
-        dependsOn("checkJetBrainsSecrets")
-        certificateChain = signPluginCertificateChain
-        privateKey = signPluginPrivateKey
-        password = signPluginPassword
-    }
-
-    publishPlugin {
-        // TODO(ChrisCarini - 2021-10-12) - The `patchChangelog` dependency is not needed,
-        //  because it is taken care of in the `release.yml` file. Follow up with the IJ
-        //  plugin template to see if this is removed / modified in a month or so.
-//    dependsOn("patchChangelog")
-        dependsOn("checkJetBrainsSecrets")
-        token = publishPluginToken
-
-        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
-        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels = properties("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
-    }
-
-    // Sanity check task to ensure necessary variables are set.
-    register("checkJetBrainsSecrets") {
-        doLast {
-            println("signPluginCertificateChain: ${if (signPluginCertificateChain.isNotEmpty()) "IS" else "is NOT"} set.")
-            println("signPluginPrivateKey:       ${if (signPluginPrivateKey.isNotEmpty()) "IS" else "is NOT"} set.")
-            println("signPluginPassword:         ${if (signPluginPassword.isNotEmpty()) "IS" else "is NOT"} set.")
-            println("publishPluginToken:         ${if (publishPluginToken.isNotEmpty()) "IS" else "is NOT"} set.")
-        }
-    }
 }
 
 dependencies {
+    // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
+    intellijPlatform {
+        val version = properties("platformVersion").get()
+        val type = properties("platformType").get()
+        create(IntelliJPlatformType.fromCode(type), version)
+
+        // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
+        plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
+        // Bundled plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file.
+        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
+
+        instrumentationTools()
+
+        // `jetbrainsRuntime()` is necessary mostly for EAP/SNAPSHOT releases of IJ so that the IDE pulls the correct JBR
+        //      - https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-jetbrains-runtime.html#obtained-with-intellij-platform-from-maven
+        jetbrainsRuntime()
+        pluginVerifier()
+        zipSigner()
+    }
+
     testImplementation(group = "junit", name = "junit", version = "4.13.2")
     testImplementation("org.testng:testng:7.10.2")
     testImplementation("org.mockito:mockito-core:5.12.0")

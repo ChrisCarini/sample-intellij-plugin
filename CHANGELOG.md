@@ -8,6 +8,7 @@
 
 ### Changed
 - Changed gradle build to Kotlin DSL (from Groovy DSL) in preparation of `IntelliJ Platform Gradle Plugin 2.0.0`.
+- Upgrading to `IntelliJ Platform Gradle Plugin 2.0.0-beta6`
 
 ### Deprecated
 

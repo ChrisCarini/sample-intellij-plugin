@@ -3,6 +3,7 @@
 *.iws
 .gradle/
 .qodana/
+.shelf/
 build/
 gradle/
 out/

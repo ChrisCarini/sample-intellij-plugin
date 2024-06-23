@@ -13,8 +13,8 @@ fun extra(key: String): String = project.ext.get(key) as String
 plugins {
     id("java")
     id("idea")
-    id("org.jetbrains.intellij.platform") version "2.0.0-beta6"
-    id("org.jetbrains.intellij.platform.migration") version "2.0.0-beta6"
+    id("org.jetbrains.intellij.platform") version "2.0.0-beta8"
+    id("org.jetbrains.intellij.platform.migration") version "2.0.0-beta8"
     id("org.jetbrains.changelog") version "2.2.0"
     id("com.dorongold.task-tree") version "3.0.0" // provides `taskTree` task (e.g. `./gradlew build taskTree`; docs: https://github.com/dorongold/gradle-task-tree)
 }
@@ -134,17 +134,7 @@ intellijPlatform {
     }
 
     verifyPlugin {
-        // TODO(ChrisCarini) - Using the below will cause to fail because of `IDE must reside in a directory: `.
-        //  See https://jetbrains-platform.slack.com/archives/C05C80200LS/p1716279125890439 for more details and
-        //  hopefully a status update.
-        freeArgs = listOf("-mute TemplateWordInPluginName")
-        // Leave `ideVersions` commented out so that the `listProductsReleases` task will execute.
-        // If no `ideVersions` is specified, the output from the `listProductsReleases` will be used.
-        //
-        // NOTE: I use the `listProductsReleases` task and `generateIdeVersionsList` task for the
-        // `ChrisCarini/intellij-platform-plugin-verifier-action` GitHub Action to verify on CI.
-        // ideVersions = Arrays.asList(properties("pluginVerifierIdeVersions").split(","))
-
+        freeArgs = listOf("-mute", "ForbiddenPluginIdPrefix,TemplateWordInPluginId,TemplateWordInPluginName")
         val failureLevels = getFailureLevels()
         logger.debug("Using ${failureLevels.size} Failure Levels: $failureLevels")
         failureLevel.set(failureLevels)

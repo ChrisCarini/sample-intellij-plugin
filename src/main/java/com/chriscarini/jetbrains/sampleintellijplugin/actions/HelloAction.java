@@ -8,9 +8,10 @@ import com.intellij.openapi.ui.Messages;
 
 public class HelloAction extends DumbAwareAction {
     public HelloAction() {
-        super("Hello!");
-        getTemplatePresentation().setIcon(ProductIcons.getInstance().getProductIcon());
-        getTemplatePresentation().setDescription("A simple hello.");
+        super("Hello!", "A simple hello.", ProductIcons.getInstance().getProductIcon());
+//        super("Hello!");
+//        getTemplatePresentation().setIcon(ProductIcons.getInstance().getProductIcon());
+//        getTemplatePresentation().setDescription("A simple hello.");
     }
 
     @Override

@@ -31,6 +31,14 @@ idea {
   }
 }
 
+// Add the `gradle.properties` file into the jar so we can access via
+//  `Constants.class.getClassLoader().getResourceAsStream("gradle.properties");`
+jar {
+  from("${projectDir}") {
+    include 'gradle.properties'
+  }
+}
+
 intellij {
   // NOTE: We don't currently have/need any extension points from the GitHub plugin, but since we want to leverage the
   //  GitHubErrorReportSubmitter, we need to depend on the GitHub plugin.

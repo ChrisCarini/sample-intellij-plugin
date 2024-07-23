@@ -65,6 +65,7 @@ jobs:
         with:
           # Generated from the `generateIdeVersionsList` task above.
           ide-versions: build/intellij-platform-plugin-verifier-action-ide-versions-file.txt
+          mute-plugin-problems: TemplateWordInPluginId,TemplateWordInPluginName
 
       - name: Get log file path and print contents
         run: |

@@ -13,8 +13,8 @@ fun extra(key: String): String = project.ext.get(key) as String
 plugins {
     id("java")
     id("idea")
-    id("org.jetbrains.intellij.platform") version "2.0.0-beta8"
-    id("org.jetbrains.intellij.platform.migration") version "2.0.0-beta8"
+    id("org.jetbrains.intellij.platform") version "2.0.0-rc1"
+    id("org.jetbrains.intellij.platform.migration") version "2.0.0-rc1"
     id("org.jetbrains.changelog") version "2.2.0"
     id("com.dorongold.task-tree") version "3.0.0" // provides `taskTree` task (e.g. `./gradlew build taskTree`; docs: https://github.com/dorongold/gradle-task-tree)
 }
@@ -24,7 +24,7 @@ version = properties("pluginVersion").get()
 
 repositories {
     mavenCentral()
-    
+
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-repositories-extension.html
     intellijPlatform {
         defaultRepositories()
@@ -116,7 +116,7 @@ intellijPlatform {
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html#specifying-a-release-channel
         channels = properties("pluginVersion")
-            .map { 
+            .map {
                 listOf(
                     it
                         .substringAfter('-', "")
@@ -143,7 +143,7 @@ intellijPlatform {
             val type = properties("platformType").get()
             logger.lifecycle("Verifying against IntelliJ Platform $type $version")
             ide(IntelliJPlatformType.fromCode(type), version)
-            
+
             recommended()
         }
     }
@@ -210,7 +210,7 @@ tasks {
     }
 
     // In "IntelliJ Platform Gradle Plugin 2.*", the `listProductsReleases` task no longer exists, but
-    // instead the `printProductReleases` task does. This task is necassary to take the output of 
+    // instead the `printProductReleases` task does. This task is necessary to take the output of
     // `printProductReleases` and write it to a file for use in the `generateIdeVersionsList` task below.
     val listProductReleasesTaskName = "listProductsReleases"
     register(listProductReleasesTaskName) {
@@ -274,7 +274,8 @@ dependencies {
     intellijPlatform {
         val version = properties("platformVersion").get()
         val type = properties("platformType").get()
-        create(IntelliJPlatformType.fromCode(type), version)
+        val useInstaller = !version.endsWith("-SNAPSHOT")
+        create(type=IntelliJPlatformType.fromCode(type), version=version, useInstaller=useInstaller)
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })

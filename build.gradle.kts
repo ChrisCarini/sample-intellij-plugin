@@ -14,7 +14,7 @@ plugins {
     id("java")
     id("idea")
     id("org.jetbrains.intellij.platform") version "2.0.0-rc1"
-    id("org.jetbrains.intellij.platform.migration") version "2.0.0-rc1"
+    id("org.jetbrains.intellij.platform.migration") version "2.0.0-rc2"
     id("org.jetbrains.changelog") version "2.2.0"
     id("com.dorongold.task-tree") version "3.0.0" // provides `taskTree` task (e.g. `./gradlew build taskTree`; docs: https://github.com/dorongold/gradle-task-tree)
 }
@@ -133,6 +133,10 @@ intellijPlatform {
         password = signPluginPassword
     }
 
+//    TODO(ChrisCarini) - Change `verifyPlugin` to `pluginVerification` when the IJ gradle plugin 2.0 is released.
+//     See below for details:
+//          - https://jetbrains-platform.slack.com/archives/C05C80200LS/p1722273893215199
+//    pluginVerification {
     verifyPlugin {
         freeArgs = listOf("-mute", "ForbiddenPluginIdPrefix,TemplateWordInPluginId,TemplateWordInPluginName")
         val failureLevels = getFailureLevels()

@@ -3,6 +3,7 @@
 *.iws
 .gradle/
 .qodana/
+.shelf/
 build/
 gradle/
 out/
@@ -12,3 +13,5 @@ private.pem
 chain.crt
 *.DS_Store
 .idea/
+.installedPlugins/
+.intellijPlatform/

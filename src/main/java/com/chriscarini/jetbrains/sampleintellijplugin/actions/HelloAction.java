@@ -6,7 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 
-public class HelloAction extends DumbAwareAction {
+final public class HelloAction extends DumbAwareAction {
     public HelloAction() {
         super("Hello!");
         getTemplatePresentation().setIcon(ProductIcons.getInstance().getProductIcon());

@@ -28,11 +28,11 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         timeout-minutes: 1
 
-      - name: Setup Java 17
+      - name: Setup Java
         uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
         timeout-minutes: 5
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'zulu'
           cache: gradle
 
@@ -64,6 +64,12 @@ jobs:
         with:
           # Generated from the `generateIdeVersionsList` task above.
           ide-versions: build/intellij-platform-plugin-verifier-action-ide-versions-file.txt
+          # TODO(ChrisCarini) - This can be removed once https://youtrack.jetbrains.com/issue/MP-6711 is resolved.
+          #  See below for details:
+          #       - https://jetbrains-platform.slack.com/archives/C012S7PA8CQ/p1722334099316129?thread_ts=1719921236.855369&cid=C012S7PA8CQ
+          #       - https://youtrack.jetbrains.com/issue/MP-6711/Plugin-Verifier-Muted-plugin-problems-show-up-in-the-standard-output-as-structure-warnings#focus=Comments-27-10232348.0-0
+          failure-levels: |
+            PLUGIN_STRUCTURE_WARNINGS
 
       - name: Get log file path and print contents
         run: |

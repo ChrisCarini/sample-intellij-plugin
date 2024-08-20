@@ -73,9 +73,6 @@ jobs:
 
           echo "ideVersions=$IDE_VERSIONS" >> $GITHUB_OUTPUT
           echo "pluginVerifierHomeDir=~/.pluginVerifier" >> $GITHUB_OUTPUT
-          echo "=================== [START] PROPERTIES ================= "
-          echo "$PROPERTIES"
-          echo "=================== [END] PROPERTIES =================== "
 
       # Cache Plugin Verifier IDEs
       - name: Setup Plugin Verifier IDEs Cache

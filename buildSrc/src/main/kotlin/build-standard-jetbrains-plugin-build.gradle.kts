@@ -26,6 +26,7 @@ val pluginVerifierExcludeFailureLevels = properties("pluginVerifierExcludeFailur
 val pluginVerifierIdeVersions = properties("pluginVerifierIdeVersions")
 val pluginVerifierMutePluginProblems = properties("pluginVerifierMutePluginProblems")
 val pluginVersion = properties("pluginVersion")
+val shouldPublishPlugin = properties("publishPlugin").equals("true")
 
 plugins {
     id("java")
@@ -233,7 +234,7 @@ changelog {
 tasks {
     publishPlugin {
         dependsOn(patchChangelog)
-        enabled = providers.provider { pluginRepositoryUrl }.getOrElse("false") == "true"
+        enabled = shouldPublishPlugin && providers.provider { pluginRepositoryUrl }.getOrElse("false") == "true"
     }
 
     printProductsReleases {

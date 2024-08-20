@@ -10,10 +10,10 @@ import java.util.EnumSet
 
 val isNotCI = System.getenv("CI") != "true"
 
+fun resolve(extraKey: String, environmentKey: String): String = if (isNotCI) extra(extraKey) else environment(environmentKey)
 fun properties(key: String): String = providers.gradleProperty(key).get()
 fun environment(key: String): String = providers.environmentVariable(key).get()
 fun extra(key: String): String = project.ext.get(key) as String
-fun resolve(extraKey: String, environmentKey: String): String = if (isNotCI) extra(extraKey) else environment(environmentKey)
 
 val javaVersion = properties("javaVersion")
 val platformBundledPlugins = providers.gradleProperty("platformBundledPlugins")

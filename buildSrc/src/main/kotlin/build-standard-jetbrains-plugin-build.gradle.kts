@@ -8,11 +8,9 @@ import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import java.util.EnumSet
 
-val isNotCI = System.getenv("CI") != "true"
-
-fun resolve(extraKey: String, environmentKey: String): String = if (isNotCI) extra(extraKey) else environment(environmentKey)
+//fun properties(key: String): String = providers.gradleProperty(key).getOrElse("ChrisCarini_DEBUG_DEFAULT_INVALID_$key")
 fun properties(key: String): String = providers.gradleProperty(key).get()
-fun environment(key: String): String = providers.environmentVariable(key).get()
+fun environment(key: String): Provider<String> = providers.environmentVariable(key)
 fun extra(key: String): String = project.ext.get(key) as String
 
 val javaVersion = properties("javaVersion")
@@ -29,6 +27,20 @@ val pluginVerifierExcludeFailureLevels = properties("pluginVerifierExcludeFailur
 val pluginVerifierIdeVersions = properties("pluginVerifierIdeVersions")
 val pluginVerifierMutePluginProblems = properties("pluginVerifierMutePluginProblems")
 val pluginVersion = properties("pluginVersion")
+logger.lifecycle("javaVersion: $javaVersion")
+logger.lifecycle("platformBundledPlugins: $platformBundledPlugins")
+logger.lifecycle("platformPlugins: $platformPlugins")
+logger.lifecycle("platformType: $platformType")
+logger.lifecycle("platformVersion: $platformVersion")
+logger.lifecycle("pluginGroup: $pluginGroup")
+logger.lifecycle("pluginName: $pluginName")
+logger.lifecycle("pluginRepositoryUrl: $pluginRepositoryUrl")
+logger.lifecycle("pluginSinceBuild: $pluginSinceBuild")
+logger.lifecycle("pluginUntilBuild: $pluginUntilBuild")
+logger.lifecycle("pluginVerifierExcludeFailureLevels: $pluginVerifierExcludeFailureLevels")
+logger.lifecycle("pluginVerifierIdeVersions: $pluginVerifierIdeVersions")
+logger.lifecycle("pluginVerifierMutePluginProblems: $pluginVerifierMutePluginProblems")
+logger.lifecycle("pluginVersion: $pluginVersion")
 
 plugins {
     id("java")
@@ -102,6 +114,7 @@ idea {
     }
 }
 
+val isNotCI = System.getenv("CI") != "true"
 if (isNotCI) {
     // The below file (jetbrainsCredentials.gradle) should contain the below:
     //     project.ext.set("intellijSignPluginCertificateChain", new File("./chain.crt").getText("UTF-8"))
@@ -112,6 +125,8 @@ if (isNotCI) {
     // Because this contains credentials, this file is also included in .gitignore file.
     apply(from = "jetbrainsCredentials.gradle")
 }
+fun resolve(extraKey: String, environmentKey: String): String =
+    if (isNotCI) extra(extraKey) else environment(environmentKey).getOrElse("DEFAULT_INVALID_$environmentKey")
 
 val signPluginCertificateChain = resolve("intellijSignPluginCertificateChain", "CERTIFICATE_CHAIN")
 val signPluginPrivateKey = resolve("intellijSignPluginPrivateKey", "PRIVATE_KEY")

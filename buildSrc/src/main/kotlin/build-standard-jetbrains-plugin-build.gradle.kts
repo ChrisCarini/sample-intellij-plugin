@@ -8,7 +8,8 @@ import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import java.util.EnumSet
 
-fun properties(key: String): String = providers.gradleProperty(key).getOrElse("ChrisCarini_DEBUG_DEFAULT_INVALID_$key")
+//fun properties(key: String): String = providers.gradleProperty(key).getOrElse("ChrisCarini_DEBUG_DEFAULT_INVALID_$key")
+fun properties(key: String): String = providers.gradleProperty(key).get()
 fun environment(key: String): Provider<String> = providers.environmentVariable(key)
 fun extra(key: String): String = project.ext.get(key) as String
 

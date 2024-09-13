@@ -13,9 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        timeout-minutes: 1
+        timeout-minutes: 1      # Setup Java environment for the next steps
 
-      # Setup Java environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@2dfa2011c5b2a0f1489bf9e433881c92c1631f88 # v4.3.0
         timeout-minutes: 5

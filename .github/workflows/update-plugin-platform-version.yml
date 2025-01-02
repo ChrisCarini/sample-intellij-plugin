@@ -15,6 +15,6 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}
 
-      - uses: ChrisCarini/gh-test-ij-release-update-action@ChrisCarini/4partVersion
+      - uses: ChrisCarini/gh-test-ij-release-update-action@main
         with:
           PAT_TOKEN_FOR_IJ_UPDATE_ACTION: ${{ secrets.PAT_TOKEN_FOR_IJ_UPDATE_ACTION }}

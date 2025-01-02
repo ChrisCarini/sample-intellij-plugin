@@ -7,6 +7,7 @@
 ### Added
 
 ### Changed
+- Upgrading IntelliJ from 2024.3.1 to 0.0.0
 
 ### Deprecated
 

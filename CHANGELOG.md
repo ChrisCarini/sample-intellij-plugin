@@ -7,7 +7,6 @@
 ### Added
 
 ### Changed
-- Upgrading IntelliJ from 2025.2.1 to 2025.2.2
 
 ### Deprecated
 
@@ -16,6 +15,12 @@
 ### Fixed
 
 ### Security
+
+## [2.1.2] - 2025-09-20
+
+### Changed
+
+- Upgrading IntelliJ from 2025.2.1 to 2025.2.2
 
 ## [2.1.1] - 2025-08-30
 
@@ -386,7 +391,8 @@
 
 - Initial Revision. Laying the foundation.
 
-[Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v2.1.2...HEAD
+[2.1.2]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v2.0.3...v2.1.0
 [2.0.3]: https://github.com/ChrisCarini/sample-intellij-plugin/compare/v2.0.2...v2.0.3

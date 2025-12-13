@@ -40,6 +40,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      # Harden the runner
+      - name: Harden Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          egress-policy: audit
+
       # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -81,6 +87,12 @@ jobs:
       version: ${{ steps.properties.outputs.version }}
       changelog: ${{ steps.properties.outputs.changelog }}
     steps:
+
+      # Harden the runner
+      - name: Harden Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          egress-policy: audit
 
       # Check out current repository
       - name: Fetch Sources
@@ -143,6 +155,12 @@ jobs:
     needs: [ build, files-changed ]
     runs-on: ubuntu-latest
     steps:
+
+      # Harden the runner
+      - name: Harden Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          egress-policy: audit
 
       # Check out current repository
       - name: Fetch Sources

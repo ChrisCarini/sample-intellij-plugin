@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+  # Allow manual triggering of the workflow
+  workflow_dispatch:
+
 # The concurrency group is configured to run the workflow on the latest iteration of a PR
 # (and cancel workflows for older iterations).
 concurrency:

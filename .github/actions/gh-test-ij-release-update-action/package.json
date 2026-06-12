@@ -28,7 +28,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.9.1",
+    "@actions/core": "^1.11.1",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
     "@actions/glob": "^0.3.0",
@@ -36,7 +36,7 @@
     "@octokit/webhooks-definitions": "^3.67.3",
     "properties": "^1.2.1",
     "semver": "^7.5.2",
-    "simple-git": "^3.32.3"
+    "simple-git": "^3.36.0"
   },
   "devDependencies": {
     "@types/node": "^18.0.3",
